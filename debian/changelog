@@ -1,3 +1,9 @@
+django-syncmedia (0.1.1-1) stable; urgency=low
+
+  * release 02 jul 2013 (1)
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Tue, 02 Jul 2013 19:10:49 +0200
+
 django-syncmedia (0.1-1) stable; urgency=low
 
   * fixed rev number
