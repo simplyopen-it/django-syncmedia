@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+#
+# Example:
+#             user    pw     host port src_path              dst_path
+# ./rsync.exp michele prova1 argo 22 /home/michele/testing/ ~/testing/
+#
+
+
+set username [lindex $argv 0]
+set password [lindex $argv 1]
+set host [lindex $argv 2]
+set port [lindex $argv 3]
+set src_path [lindex $argv 4]
+set dst_path [lindex $argv 5]
+set type [lindex $argv 6]
+
+set force_conservative 0  ;# set to 1 to force conservative mode even if
+                          ;# script wasn't run conservatively originally
+if {$force_conservative} {
+        set send_slow {1 .1}
+        proc send {ignore arg} {
+                sleep .1
+                exp_send -s -- $arg
+        }
+}
+set timeout -1
+set test "--rsh=ssh -C -p$port"
+if {$type eq "push"} {
+    spawn /usr/bin/rsync $test -rupogtzvp $src_path $username@$host:$dst_path
+} else {
+    spawn /usr/bin/rsync $test -rupogtzvp $username@$host:$src_path $dst_path
+}
+match_max 10000
+expect -ex "$username@$host's password:"
+send -- "$password\r"
+expect eof
+exit
+

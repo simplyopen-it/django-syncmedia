@@ -1,0 +1,17 @@
+Source: django-syncmedia
+Section: python
+Priority: extra
+Build-Depends: debhelper (>= 9)
+Build-Depends-Indep: python-support (>= 1.0), python
+Standards-Version: 3.9.3
+Maintainer: Matteo Atti <attuch@gmail.com>
+
+Package: python-django-syncmedia
+Section: python
+Priority: extra
+Architecture: all
+Depends: ${misc:Depends}, python-django
+Description: Allow sync of static files for load balanced systems.
+ Sync of static files for load balanced systems.
+
+
