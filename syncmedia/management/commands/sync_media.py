@@ -87,7 +87,8 @@ class Command(BaseCommand):
                 ret = host.push() # TODO: consent to specify dirs from options
                 self.stdout.write(repr(ret) + "\n")
             except ObjectDoesNotExist:
-                raise RuntimeError("Host %s is not registered, try to call 'syncmedia init' first", url)
+                raise RuntimeError("Host %s is not registered, try to call 'syncmedia init' first",
+                                   url)
         elif action == 'pull':
             url = getfqdn()
             try:
@@ -95,7 +96,8 @@ class Command(BaseCommand):
                 ret = host.pull() # TODO: consent to specify a preferred host from options
                 self.stdout.write(repr(ret) + "\n")
             except ObjectDoesNotExist:
-                raise RuntimeError("Host %s is not registered, try to call 'syncmedia init' first", url)
+                raise RuntimeError("Host %s is not registered, try to call 'syncmedia init' first",
+                                   url)
         else:
             self.stdout.write("./run.py sync_media %s\n" % Command.synopsis)
             sys.exit(1)
