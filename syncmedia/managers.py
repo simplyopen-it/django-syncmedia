@@ -16,6 +16,20 @@ logger = getLogger("syncmedia.manager")
 
 class HostManager(models.Manager):
 
+    def _notify(self, this, host, proto='http'):
+        if proto == 'http':
+            conn = httplib.HTTPConnection(host.url)
+        elif proto == 'https':
+            conn = httplib.HTTPSConnection(host.url)
+        params = urllib.urlencode({'id': this.id})
+        conn.request("POST", reverse('sync'), params)
+        response = conn.getresponse()
+        logger.debug('response: %s', response)
+        if response.status == 301:
+            host = response.getheader('location').slpit('://')
+            return self._notify(this, host[1], proto=host[0])
+        return True
+
     def initialize(self, user, port=22, key=None):
         ''' Initialize a new syncronizing host.
         It reads all others host's public keys from the database and
@@ -83,24 +97,8 @@ class HostManager(models.Manager):
             this_host.save()
         # Notify other Hosts
         hosts = self.all().exclude(url=this_host.url)
-        response = None
         for host in hosts:
-            try:
-                logger.debug("%s: trying HTTP", host.url)
-                conn = httplib.HTTPConnection(host.url)
-                params = urllib.urlencode({'id': this_host.id})
-                conn.request("POST", reverse('sync'), params)
-            except socket.error, e:
-                logger.warning("%s: %s... trying HTTPS", host.url, e)
-                try:
-                    conn = httplib.HTTPSConnection(host.url)
-                    params = urllib.urlencode({'id': this_host.id})
-                    conn.request("POST", reverse('sync'), params)
-                except Exception, e:
-                    logger.error("%s: %s", host.url, e)
-                    continue
-            response = conn.getresponse()
-            logger.debug("%s response: %s", host.url, response)
+            self._notify(this_host, host)
         return (this_host, created)
 
     def get_this(self):
