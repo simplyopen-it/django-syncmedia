@@ -1,3 +1,9 @@
+django-syncmedia (0.1.2-1) UNRELEASED; urgency=low
+
+  * NMU: 0.1.2
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Tue, 09 Jul 2013 14:32:38 +0200
+
 django-syncmedia (0.1.1-1) stable; urgency=low
 
   * release 02 jul 2013 (1)
