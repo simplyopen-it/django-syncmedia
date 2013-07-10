@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-syncmedia',
-    version='0.1.2',
+    version='0.1.3',
     description="Allow sync of static files for load balanced systems.",
     long_description=('TODO!!!'),
     keywords='sync, static',
