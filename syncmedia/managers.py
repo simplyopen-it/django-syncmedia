@@ -26,7 +26,7 @@ class HostManager(models.Manager):
         response = conn.getresponse()
         logger.debug('response: %s', response)
         if response.status == 301:
-            host = response.getheader('location').slpit('://')
+            host = response.getheader('location').split('://')
             return self._notify(this, host[1], proto=host[0])
         return True
 
