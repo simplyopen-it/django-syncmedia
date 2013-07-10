@@ -22,7 +22,6 @@ class HostManager(models.Manager):
         params = urllib.urlencode({'id': this.id})
         conn.request("POST", reverse('sync'), params)
         response = conn.getresponse()
-        logger.debug('response: %s', response)
         if response.status == httplib.MOVED_PERMANENTLY:
             host_val = httplib.urlsplit(response.getheader('location'))
             try:
