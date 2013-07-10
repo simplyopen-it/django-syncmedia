@@ -66,8 +66,7 @@ class HostManager(models.Manager):
             rsa_pub = key
         else:
             raise ValueError(
-                "'key' must be a valid RSA public key or a file that \
-                contains one; '%s' given" % key)
+                "'key' must be a valid RSA public key or a file that contains one; '%s' given" % key)
         # Get other Host's keys
         pubkeys = [elem.get('pubkey') for elem in self.all().values('pubkey')]
         # write keys to authorized_keys
