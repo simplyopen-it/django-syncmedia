@@ -27,7 +27,7 @@ class Host(models.Model):
     def __unicode__(self):
         return str(" ").join([self.hostname, self.url])
 
-    def push(self, sync_dirs=None, timeout=60.0):
+    def push(self, sync_dirs=None, timeout=10):
         ''' Rsync push to others hosts.
 
         Parameters
@@ -57,8 +57,8 @@ class Host(models.Model):
                     '/usr/bin/rsync',
                     '-r',
                     '-e',
-                    "ssh -o StrictHostKeyChecking=no -p %s -i %s" % (host.port, path_rsa),
-                    "--contimeout=%s" % timeout,
+                    "ssh -o StrictHostKeyChecking=no ConnectTimeout=%s -p %s -i %s" % \
+                    (timeout, host.port, path_rsa),
                     path,
                     "%s@%s:%s" % (host.username, host.url, path),
                 ]
@@ -76,7 +76,7 @@ class Host(models.Model):
                     ret[host.url].append( (sync_dir, False) )
         return ret
 
-    def pull(self, host=None, sync_dirs=None, timeout=60.0):
+    def pull(self, host=None, sync_dirs=None, timeout=10):
         ''' Rsync pull to others hosts.
 
         Parameters
@@ -113,7 +113,8 @@ class Host(models.Model):
                 '/usr/bin/rsync',
                 '-r',
                 '-e',
-                "ssh -o StrictHostKeyChecking=no -p %s -i %s" % (host.port, path_rsa),
+                "ssh -o StrictHostKeyChecking=no ConnectTimeout=%s -p %s -i %s" % \
+                (timeout, host.port, path_rsa),
                 "%s@%s:%s" % (host.username, host.url, path),
                 "--contimeout=%s" % timeout,
                 path,
