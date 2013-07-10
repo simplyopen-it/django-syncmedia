@@ -3,8 +3,6 @@ import os
 import pwd
 import httplib
 import urllib
-import socket
-
 from django.db import models
 from socket import gethostname, getfqdn
 from django.core.exceptions import ObjectDoesNotExist
@@ -25,9 +23,14 @@ class HostManager(models.Manager):
         conn.request("POST", reverse('sync'), params)
         response = conn.getresponse()
         logger.debug('response: %s', response)
-        if response.status == 301:
-            host = response.getheader('location').split('://')
-            return self._notify(this, host[1], proto=host[0])
+        if response.status == httplib.MOVED_PERMANENTLY:
+            host_val = httplib.urlsplit(response.getheader('location'))
+            try:
+                host = self.get(url=host_val.netloc)
+            except ObjectDoesNotExist:
+                logger.warning("Host %s not registered" % host_val.netloc)
+                return False
+            return self._notify(this, host, proto=host_val.scheme)
         return True
 
     def initialize(self, user, port=22, key=None):
@@ -67,15 +70,6 @@ class HostManager(models.Manager):
         else:
             raise ValueError(
                 "'key' must be a valid RSA public key or a file that contains one; '%s' given" % key)
-        # Get other Host's keys
-        pubkeys = [elem.get('pubkey') for elem in self.all().values('pubkey')]
-        # write keys to authorized_keys
-        auth_fd = open(os.path.join(home_ssh, "authorized_keys"), 'a')
-        try:
-            for pubkey in pubkeys:
-                auth_fd.write("%s" % pubkey)
-        finally:
-            auth_fd.close()
         # Create the new host
         try:
             this_host = self.get(url=url)
@@ -94,9 +88,18 @@ class HostManager(models.Manager):
             created = True
         finally:
             this_host.save()
+        other_hosts = self.all().exclude(id=this_host.id)
+        # Get other Host's keys
+        pubkeys = [elem.get('pubkey') for elem in other_hosts.values('pubkey')]
+        # write keys to authorized_keys
+        auth_fd = open(os.path.join(home_ssh, "authorized_keys"), 'a')
+        try:
+            for pubkey in pubkeys:
+                auth_fd.write("%s" % pubkey)
+        finally:
+            auth_fd.close()
         # Notify other Hosts
-        hosts = self.all().exclude(url=this_host.url)
-        for host in hosts:
+        for host in other_hosts:
             self._notify(this_host, host)
         return (this_host, created)
 
