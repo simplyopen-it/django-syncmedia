@@ -12,5 +12,6 @@ hidden/
 .pydevproject
 .settings/
 \#*
+.\#*
 .ropeproject
 ***REMOVED***/locale/
