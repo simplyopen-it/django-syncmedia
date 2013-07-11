@@ -1,3 +1,9 @@
+django-syncmedia (0.1.4-2) UNRELEASED; urgency=low
+
+  * debian/control more standard
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Thu, 11 Jul 2013 11:07:08 +0200
+
 django-syncmedia (0.1.4-1) UNRELEASED; urgency=low
 
   * NMU 0.1.4
