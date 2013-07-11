@@ -4,7 +4,7 @@ Priority: extra
 Build-Depends: debhelper (>= 9)
 Build-Depends-Indep: python-support (>= 1.0), python
 Standards-Version: 3.9.3
-Maintainer: Matteo Atti <attuch@gmail.com>
+Maintainer: Marco Pattaro <mpattaro@gmail.com>
 
 Package: python-django-syncmedia
 Section: python
