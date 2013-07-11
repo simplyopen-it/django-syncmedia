@@ -28,6 +28,6 @@ setup(
         'syncmedia',
         'syncmedia.management',
         'syncmedia.migrations',
-        'syncmedia.commands',
+        'syncmedia.management.commands',
     ],
 )
