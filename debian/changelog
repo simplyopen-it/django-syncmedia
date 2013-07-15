@@ -1,3 +1,9 @@
+django-syncmedia (0.1.5-1) stable; urgency=low
+
+  * release 0.1.5
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Mon, 15 Jul 2013 14:49:51 +0200
+
 django-syncmedia (0.1.4-2) stable; urgency=low
 
   * debian/control more standard
