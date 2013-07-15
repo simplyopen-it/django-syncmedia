@@ -57,7 +57,7 @@ class Host(models.Model):
                     '/usr/bin/rsync',
                     '-r',
                     '-e',
-                    "ssh -o StrictHostKeyChecking=no ConnectTimeout=%s -p %s -i %s" % \
+                    "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
                     (timeout, host.port, path_rsa),
                     path,
                     "%s@%s:%s" % (host.username, host.url, path),
@@ -113,10 +113,9 @@ class Host(models.Model):
                 '/usr/bin/rsync',
                 '-r',
                 '-e',
-                "ssh -o StrictHostKeyChecking=no ConnectTimeout=%s -p %s -i %s" % \
+                "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
                 (timeout, host.port, path_rsa),
                 "%s@%s:%s" % (host.username, host.url, path),
-                "--contimeout=%s" % timeout,
                 path,
             ]
             try:
