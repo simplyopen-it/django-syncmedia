@@ -13,6 +13,7 @@ log_and_eval ()
 	fi
 }
 
+APP_NAME="syncmedia"
 GIT_VERSION="$1"
 echo "git revision: $GIT_VERSION"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -20,7 +21,7 @@ echo "working dir: $DIR"
 cd "$DIR"
 NAME=$(grep "Source:" debian/control | awk -F": " '{ print $2 }')
 echo "project name: $NAME"
-VERSION=$(grep -m1 "__version__" syncmedia/__init__.py | awk -F"=" '{ print $2 }' | tr -d " " | tr -d "'" | tr -d "\"" | tr -d ",")
+VERSION=$(grep -m1 "__version__" "$APP_NAME"/__init__.py | awk -F"=" '{ print $2 }' | tr -d " " | tr -d "'" | tr -d "\"" | tr -d ",")
 echo "original version: $VERSION"
 TAR_NAME="$NAME""_$VERSION.orig.tar.gz"
 echo "archive name: $TAR_NAME"
