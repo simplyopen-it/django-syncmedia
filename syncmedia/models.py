@@ -27,13 +27,28 @@ class Host(models.Model):
     def __unicode__(self):
         return str(" ").join([self.hostname, self.url])
 
-    def push(self, sync_dirs=None, timeout=10):
+    def _kill(self, host=None):
+        if host is None:
+            command = COM_RELOAD
+        else:
+            command = [
+                '/usr/bin/ssh',
+                '%s' % host.url,
+                '-l %s' % host.username,
+                '-p %s' % host.port,
+                '-c %s' % COMM_RELOAD,
+            ]
+        return subprocess.call(command)
+
+    def push(self, sync_dirs=None, timeout=10, kill=False):
         ''' Rsync push to others hosts.
 
         Parameters
         ----------
         sync_dirs: list of directory to sync (path a relative to
             PROJECT_PATH).
+        timeout: timeout in seconds for ssh connection.
+        kill: if True call a remote command to restart the server.
 
         Returns
         -------
@@ -76,7 +91,7 @@ class Host(models.Model):
                     ret[host.url].append( (sync_dir, False) )
         return ret
 
-    def pull(self, host=None, sync_dirs=None, timeout=10):
+    def pull(self, host=None, sync_dirs=None, timeout=10, kill=False):
         ''' Rsync pull to others hosts.
 
         Parameters
@@ -85,6 +100,8 @@ class Host(models.Model):
              be picked.
         sync_dirs: list of directory to sync (path a relative to
             PROJECT_PATH).
+        timeout: timeout in seconds for ssh connection.
+        kill: if True call a command to restart the local server.
 
         Returns
         -------
