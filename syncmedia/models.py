@@ -12,10 +12,15 @@ from syncmedia import GUNICORN_WSGI
 
 logger = getLogger("syncmedia.models")
 
+
+GUNICORN_WSGI="ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | awk '{ print $1 }' | xargs kill -HUP" % settings.PROJECT_NAME
+
+
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
 COM_RELOAD = getattr(settings, "COMM_RELOAD", GUNICORN_WSGI)
 DEF_TIMEOUT = 10 # ssh timeout in seconds
+
 
 class Host(models.Model):
     hostname = models.CharField(max_length=256, unique=True)
