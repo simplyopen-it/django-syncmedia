@@ -8,12 +8,14 @@ from django.db import models
 from django.utils.log import getLogger
 from django.conf import settings
 from syncmedia import managers
+from syncmedia import GUNICORN_WSGI
 
 logger = getLogger("syncmedia.models")
 
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
-
+COM_RELOAD = getattr(settings, "COMM_RELOAD", GUNICORN_WSGI)
+DEF_TIMEOUT = 10 # ssh timeout in seconds
 
 class Host(models.Model):
     hostname = models.CharField(max_length=256, unique=True)
@@ -27,20 +29,34 @@ class Host(models.Model):
     def __unicode__(self):
         return str(" ").join([self.hostname, self.url])
 
-    def _kill(self, host=None):
+    @property
+    def path_rsa(self):
+        return getattr(
+            settings, "PATH_RSA",
+            os.path.join(pwd.getpwnam(self.username).pw_dir, ".ssh", "id_rsa"))
+
+    def kill(self, host=None, timeout=DEF_TIMEOUT):
         if host is None:
             command = COM_RELOAD
         else:
             command = [
                 '/usr/bin/ssh',
-                '%s' % host.url,
                 '-l %s' % host.username,
                 '-p %s' % host.port,
-                '-c %s' % COMM_RELOAD,
+                '-i %s' % self.path_rsa,
+                "-o StrictHostKeyChecking=no",
+                "-o ConnectTimeout=%s" % timeout,
+                '%s' % host.url,
+                '%s' % COM_RELOAD,
             ]
-        return subprocess.call(command)
+        try:
+            ret = subprocess.call(command)
+        except Exception, e:
+            logger.error(e)
+            ret = e.errno
+        return ret
 
-    def push(self, sync_dirs=None, timeout=10, kill=False):
+    def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
         ''' Rsync push to others hosts.
 
         Parameters
@@ -64,16 +80,12 @@ class Host(models.Model):
             ret[host.url] = []
             for sync_dir in sync_dirs:
                 path = os.path.join(PROJECT_PATH, sync_dir)
-                path_rsa = getattr(
-                    settings,
-                    "PATH_RSA",
-                    os.path.join(pwd.getpwnam(self.username).pw_dir, ".ssh", "id_rsa"))
                 rsync_call = [
                     '/usr/bin/rsync',
                     '-r',
                     '-e',
                     "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
-                    (timeout, host.port, path_rsa),
+                    (timeout, host.port, self.path_rsa),
                     path,
                     "%s@%s:%s" % (host.username, host.url, path),
                 ]
@@ -84,8 +96,16 @@ class Host(models.Model):
                     logger.error(e)
                     continue
                 if out == 0:
-                    logger.info("Syncrone, push of %s to %s SUCCEDED", sync_dir, host)
+                    logger.info("Syncmedia, push of %s to %s SUCCEDED", sync_dir, host)
                     ret[host.url].append( (sync_dir, True) )
+                    # Eventually send a command to restart remote host
+                    if kill:
+                        kill_out = self.kill(host, timeout)
+                        if kill_out == 0:
+                            logger.info("Syncmedia, kill of %s SUCCEDED", host)
+                        else:
+                            logger.warning("Syncmedia, kill of %s FAILED, retuned %s",
+                                           host, kill_out)
                 else:
                     logger.info("Syncrone, push of %s to %s FAILED", sync_dir, host)
                     ret[host.url].append( (sync_dir, False) )
@@ -122,16 +142,12 @@ class Host(models.Model):
             sync_dirs = SYNC_DIRS
         for sync_dir in sync_dirs:
             path = os.path.join(PROJECT_PATH, sync_dir)
-            path_rsa = getattr(
-                settings,
-                "PATH_RSA",
-                os.path.join(pwd.getpwnam(self.username).pw_dir, ".ssh", "id_rsa"))
             rsync_call = [
                 '/usr/bin/rsync',
                 '-r',
                 '-e',
                 "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
-                (timeout, host.port, path_rsa),
+                (timeout, host.port, self.path_rsa),
                 "%s@%s:%s" % (host.username, host.url, path),
                 path,
             ]
@@ -144,6 +160,13 @@ class Host(models.Model):
             if out == 0:
                 logger.info("pull of %s from %s SUCCEDED", sync_dir, host)
                 ret[sync_dir] = True
+                if kill:
+                    kill_out = self.kill() # Self kill! :D
+                    if kill_out == 0:
+                        logger.info("Syncmedia, kill of %s SUCCEDED", host)
+                    else:
+                        logger.warning("Syncmedia, kill of %s FAILED, retuned %s",
+                                       self, kill_out)
             else:
                 logger.info("pull of %s from %s FAILED", sync_dir, host)
                 ret[sync_dir] = False
