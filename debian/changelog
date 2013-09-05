@@ -1,3 +1,9 @@
+django-syncmedia (0.1.6+kill) UNRELEASED; urgency=low
+
+  * Testing implementation of remote service restart
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Thu, 05 Sep 2013 17:45:19 +0200
+
 django-syncmedia (0.1.5-1) stable; urgency=low
 
   * release 0.1.5
