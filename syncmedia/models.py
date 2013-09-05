@@ -8,13 +8,11 @@ from django.db import models
 from django.utils.log import getLogger
 from django.conf import settings
 from syncmedia import managers
-from syncmedia import GUNICORN_WSGI
+# from syncmedia import GUNICORN_WSGI
 
 logger = getLogger("syncmedia.models")
 
-
 GUNICORN_WSGI="ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | awk '{ print $1 }' | xargs kill -HUP" % settings.PROJECT_NAME
-
 
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
