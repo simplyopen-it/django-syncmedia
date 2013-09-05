@@ -7,7 +7,6 @@ __version__ = "0.1.5"
 #################################################
 from django.conf import settings
 
-GUNICONR_WSGI="""kill -HUP $(cat /var/run/gunicorn/%s.wsgi.pid)""" % \
-    settings.PROJECT_NAME
+GUNICORN_WSGI="ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | awk '{ print $1 }' | xargs kill -HUP" % settings.PROJECT_NAME
 
 # TODO: define other webserver's reload commands
