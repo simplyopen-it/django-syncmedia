@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.utils.log import getLogger
 from django.contrib.aderit.generic_utils.views import GenericProtectedView
-from django.http import HttpResponseRedirect
+from django.views.generic import View
+from django.http import HttpResponseRedirect, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from syncmedia.models import Host
 
 from socket import gethostname
@@ -11,6 +13,22 @@ import os
 import pwd
 
 logger = getLogger('syncmedia.views')
+
+
+class StaffProtectedView(View):
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_active and request.user.is_staff or request.user.is_active and request.user.is_superuser:
+            return super(StaffProtectedView, self).get(request, *args, **kwargs)
+        else:
+            raise Http404
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_active and request.user.is_staff or request.user.is_active and request.user.is_superuser:
+            return super(StaffProtectedView, self).post(request, *args, **kwargs)
+        else:
+            raise Http404
+
 
 class SyncKeys(GenericProtectedView):
     use_login_required_decorator = False
@@ -42,3 +60,16 @@ class SyncKeys(GenericProtectedView):
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
         return super(SyncKeys, self).dispatch(*args, **kwargs)
+
+
+class SyncMediaView(StaffProtectedView, GenericProtectedView):
+    use_login_required_decorator = True
+    ''' TO WRITE '''
+
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('type') and request.GET.get('kill'):
+            ex_type = request.GET.get('type')
+            host = Host.objects.get_this()
+            func = getattr(host, ex_type, 'push')
+            func(sync_dirs=getattr(settings, 'SYNCHRO_DIRS', '/locale'), kill=request.GET.get('kill'))
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('admin:index')))
