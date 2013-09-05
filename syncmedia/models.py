@@ -51,6 +51,7 @@ class Host(models.Model):
             ]
         try:
             ret = subprocess.call(command)
+            logger.debug("%s\nexited with status: %s", " ".join(command), ret)
         except Exception, e:
             logger.error(e)
             ret = e.errno
@@ -96,18 +97,18 @@ class Host(models.Model):
                     logger.error(e)
                     continue
                 if out == 0:
-                    logger.info("Syncmedia, push of %s to %s SUCCEDED", sync_dir, host)
+                    logger.info("push of %s to %s SUCCEDED", sync_dir, host)
                     ret[host.url].append( (sync_dir, True) )
                     # Eventually send a command to restart remote host
                     if kill:
                         kill_out = self.kill(host, timeout)
                         if kill_out == 0:
-                            logger.info("Syncmedia, kill of %s SUCCEDED", host)
+                            logger.info("kill of %s SUCCEDED", host)
                         else:
-                            logger.warning("Syncmedia, kill of %s FAILED, retuned %s",
+                            logger.warning("kill of %s FAILED, retuned %s",
                                            host, kill_out)
                 else:
-                    logger.info("Syncrone, push of %s to %s FAILED", sync_dir, host)
+                    logger.info("push of %s to %s FAILED", sync_dir, host)
                     ret[host.url].append( (sync_dir, False) )
         return ret
 
@@ -163,9 +164,9 @@ class Host(models.Model):
                 if kill:
                     kill_out = self.kill() # Self kill! :D
                     if kill_out == 0:
-                        logger.info("Syncmedia, kill of %s SUCCEDED", host)
+                        logger.info("kill of %s SUCCEDED", host)
                     else:
-                        logger.warning("Syncmedia, kill of %s FAILED, retuned %s",
+                        logger.warning("kill of %s FAILED, retuned %s",
                                        self, kill_out)
             else:
                 logger.info("pull of %s from %s FAILED", sync_dir, host)
