@@ -85,8 +85,7 @@ class HostManager(models.Manager):
                 port=port,
                 username=user, pubkey=rsa_pub)
             created = True
-        finally:
-            this_host.save()
+        this_host.save()
         other_hosts = self.all().exclude(id=this_host.id)
         # Get other Host's keys
         pubkeys = [elem.get('pubkey') for elem in other_hosts.values('pubkey')]
