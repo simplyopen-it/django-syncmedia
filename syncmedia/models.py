@@ -55,6 +55,11 @@ class Host(models.Model):
         except Exception, e:
             logger.error(e)
             ret = e.errno
+        if ret == 0:
+            logger.info("kill of %s SUCCEDED", host)
+        else:
+            logger.warning("kill of %s FAILED, retuned %s",
+                           host, ret)
         return ret
 
     def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
@@ -101,12 +106,7 @@ class Host(models.Model):
                     ret[host.url].append( (sync_dir, True) )
                     # Eventually send a command to restart remote host
                     if kill:
-                        kill_out = self.kill(host, timeout)
-                        if kill_out == 0:
-                            logger.info("kill of %s SUCCEDED", host)
-                        else:
-                            logger.warning("kill of %s FAILED, retuned %s",
-                                           host, kill_out)
+                        self.kill(host, timeout)
                 else:
                     logger.info("push of %s to %s FAILED", sync_dir, host)
                     ret[host.url].append( (sync_dir, False) )
@@ -162,12 +162,7 @@ class Host(models.Model):
                 logger.info("pull of %s from %s SUCCEDED", sync_dir, host)
                 ret[sync_dir] = True
                 if kill:
-                    kill_out = self.kill() # Self kill! :D
-                    if kill_out == 0:
-                        logger.info("kill of %s SUCCEDED", host)
-                    else:
-                        logger.warning("kill of %s FAILED, retuned %s",
-                                       self, kill_out)
+                    self.kill() # Self kill! :D
             else:
                 logger.info("pull of %s from %s FAILED", sync_dir, host)
                 ret[sync_dir] = False
