@@ -38,7 +38,7 @@ class Host(models.Model):
 
     def kill(self, host=None, timeout=DEF_TIMEOUT):
         if host is None:
-            command = ['/bin/bash', """%s""" % COM_RELOAD]
+            command = ['/bin/bash', '-c', '''"%s"''' % COM_RELOAD]
         else:
             command = [
                 '/usr/bin/ssh',
