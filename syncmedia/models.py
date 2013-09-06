@@ -8,15 +8,15 @@ from django.db import models
 from django.utils.log import getLogger
 from django.conf import settings
 from syncmedia import managers
-# from syncmedia import GUNICORN_WSGI
+from syncmedia import reload_commands
 
 logger = getLogger("syncmedia.models")
 
-GUNICORN_WSGI="""ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | cut -d" " -f2 | xargs -I{} kill -HUP {}""" % settings.PROJECT_NAME
+# GUNICORN_WSGI="""ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | cut -d" " -f2 | xargs -I{} kill -HUP {}""" % settings.PROJECT_NAME
 
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
-COM_RELOAD = getattr(settings, "COMM_RELOAD", GUNICORN_WSGI)
+COM_RELOAD = getattr(settings, "COMM_RELOAD", reload_commands.GUNICORN_WSGI)
 DEF_TIMEOUT = 10 # ssh timeout in seconds
 
 
