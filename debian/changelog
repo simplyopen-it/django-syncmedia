@@ -1,3 +1,9 @@
+django-syncmedia (0.1.8+kill4) stable; urgency=low
+
+  * Fix auto reload.
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 06 Sep 2013 14:30:51 +0200
+
 django-syncmedia (0.1.8+kill3) UNRELEASED; urgency=low
 
   * Changed kill on self kill case to escape command (should work)
