@@ -1,3 +1,9 @@
+django-syncmedia (0.1.8+kill5) UNRELEASED; urgency=low
+
+  * New GUNICORN_WSGI command
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 06 Sep 2013 16:17:24 +0200
+
 django-syncmedia (0.1.8+kill4) stable; urgency=low
 
   * Fix auto reload.
