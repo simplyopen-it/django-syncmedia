@@ -1,3 +1,10 @@
+django-syncmedia (0.1.6+kill2) UNRELEASED; urgency=low
+
+  * reload_commands.py is the place to put different server reload
+    commands definitions
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 06 Sep 2013 12:09:16 +0200
+
 django-syncmedia (0.1.6+kill) UNRELEASED; urgency=low
 
   * Testing implementation of remote service restart
@@ -57,4 +64,3 @@ django-syncmedia (0.1) stable; urgency=low
   * Initial Package
 
  -- Matteo Atti <attuch@gmail.com>  Mon, 02 Jul 2013 10:39:23 +0200
-
