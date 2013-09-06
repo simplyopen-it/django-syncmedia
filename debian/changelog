@@ -1,3 +1,10 @@
+django-syncmedia (0.1.8+kill3) UNRELEASED; urgency=low
+
+  * Changed kill on self kill case to escape command (should work)
+  * Better debug log placements
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 06 Sep 2013 12:56:25 +0200
+
 django-syncmedia (0.1.8) stable; urgency=low
 
   * v0.1.8
