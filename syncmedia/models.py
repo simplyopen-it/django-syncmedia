@@ -12,8 +12,6 @@ from syncmedia import reload_commands
 
 logger = getLogger("syncmedia.models")
 
-# GUNICORN_WSGI="""ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | cut -d" " -f2 | xargs -I{} kill -HUP {}""" % settings.PROJECT_NAME
-
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
 COM_RELOAD = getattr(settings, "COMM_RELOAD", reload_commands.GUNICORN_WSGI)
@@ -40,7 +38,7 @@ class Host(models.Model):
 
     def kill(self, host=None, timeout=DEF_TIMEOUT):
         if host is None:
-            command = COM_RELOAD
+            command = ["""%s"""] % COM_RELOAD
         else:
             command = [
                 '/usr/bin/ssh',
@@ -51,9 +49,9 @@ class Host(models.Model):
                 '%s@%s' % (host.username, host.url),
                 """%s""" % COM_RELOAD,
             ]
+        logger.debug("%s\nexited with status: %s", " ".join(command), ret)
         try:
             ret = subprocess.call(command)
-            logger.debug("%s\nexited with status: %s", " ".join(command), ret)
         except Exception, e:
             logger.error(e)
             ret = e.errno
@@ -92,9 +90,9 @@ class Host(models.Model):
                     path,
                     "%s@%s:%s" % (host.username, host.url, path),
                 ]
+                logger.debug("%s\nexited with status: %s", " ".join(rsync_call), out)
                 try:
                     out = subprocess.call(rsync_call)
-                    logger.debug("%s\nexited with status: %s", " ".join(rsync_call), out)
                 except Exception, e:
                     logger.error(e)
                     continue
@@ -154,9 +152,9 @@ class Host(models.Model):
                 "%s@%s:%s" % (host.username, host.url, path),
                 path,
             ]
+            logger.debug("%s\nexited with status: %s", " ".join(rsync_call), out)
             try:
                 out = subprocess.call(rsync_call)
-                logger.debug("%s\nexited with status: %s", " ".join(rsync_call), out)
             except Exception, e:
                 logger.error(e)
                 continue
