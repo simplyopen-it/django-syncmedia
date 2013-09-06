@@ -71,6 +71,7 @@ class SyncMediaView(StaffProtectedView, GenericProtectedView):
         if request.GET.get('type') and request.GET.get('kill'):
             ex_type = request.GET.get('type')
             host = Host.objects.get_this()
+            host.kill()
             func = getattr(host, ex_type, 'push')
             func(sync_dirs=getattr(settings, 'SYNCHRO_DIRS', 'locale/'), kill=request.GET.get('kill'))
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('admin:index')))

@@ -12,7 +12,7 @@ from syncmedia import managers
 
 logger = getLogger("syncmedia.models")
 
-GUNICORN_WSGI="ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | awk '{ print $1 }' | xargs kill -HUP" % settings.PROJECT_NAME
+GUNICORN_WSGI="""ps --ppid $(cat /var/run/gunicorn/%s.wsgi.pid) | grep python | cut -d" " -f2 | xargs -I{} kill -HUP {}""" % settings.PROJECT_NAME
 
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
@@ -44,13 +44,12 @@ class Host(models.Model):
         else:
             command = [
                 '/usr/bin/ssh',
-                '-l %s' % host.username,
                 '-p %s' % host.port,
                 '-i %s' % self.path_rsa,
                 "-o StrictHostKeyChecking=no",
                 "-o ConnectTimeout=%s" % timeout,
-                '%s' % host.url,
-                '%s' % COM_RELOAD,
+                '%s@%s' % (host.username, host.url),
+                """%s""" % COM_RELOAD,
             ]
         try:
             ret = subprocess.call(command)
