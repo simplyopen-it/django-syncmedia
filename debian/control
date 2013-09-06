@@ -2,7 +2,7 @@ Source: django-syncmedia
 Section: python
 Priority: optional
 Maintainer: Marco Pattaro <mpattaro@gmail.com>
-Build-Depends: python-all, debhelper (>= 7), python-setuptools
+Build-Depends: python, debhelper (>= 7), python-setuptools
 Standards-Version: 3.9.4
 
 Package: python-django-syncmedia
