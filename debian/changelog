@@ -1,3 +1,9 @@
+django-syncmedia (0.1.8+kill7) UNRELEASED; urgency=low
+
+  * small fixes to GUNICORN_WSGI restart command
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 06 Sep 2013 17:08:07 +0200
+
 django-syncmedia (0.1.8+kill6) UNRELEASED; urgency=low
 
   * Better logging
