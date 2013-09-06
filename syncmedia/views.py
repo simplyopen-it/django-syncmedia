@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from syncmedia.models import Host
+from django.conf import settings
 
 from socket import gethostname
 import os
@@ -70,6 +71,7 @@ class SyncMediaView(StaffProtectedView, GenericProtectedView):
         if request.GET.get('type') and request.GET.get('kill'):
             ex_type = request.GET.get('type')
             host = Host.objects.get_this()
+            host.kill()
             func = getattr(host, ex_type, 'push')
-            func(sync_dirs=getattr(settings, 'SYNCHRO_DIRS', '/locale'), kill=request.GET.get('kill'))
+            func(sync_dirs=getattr(settings, 'SYNCHRO_DIRS', 'locale/'), kill=request.GET.get('kill'))
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('admin:index')))
