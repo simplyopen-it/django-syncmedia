@@ -38,7 +38,7 @@ class Host(models.Model):
 
     def kill(self, host=None, timeout=DEF_TIMEOUT):
         if host is None:
-            command = ["""%s"""] % COM_RELOAD
+            command = ['/bin/bash', """%s""" % COM_RELOAD]
         else:
             command = [
                 '/usr/bin/ssh',
@@ -49,7 +49,7 @@ class Host(models.Model):
                 '%s@%s' % (host.username, host.url),
                 """%s""" % COM_RELOAD,
             ]
-        logger.debug("%s\nexited with status: %s", " ".join(command), ret)
+        logger.debug("%s", " ".join(command))
         try:
             ret = subprocess.call(command)
         except Exception, e:
@@ -90,7 +90,7 @@ class Host(models.Model):
                     path,
                     "%s@%s:%s" % (host.username, host.url, path),
                 ]
-                logger.debug("%s\nexited with status: %s", " ".join(rsync_call), out)
+                logger.debug("%s", " ".join(rsync_call))
                 try:
                     out = subprocess.call(rsync_call)
                 except Exception, e:
@@ -152,7 +152,7 @@ class Host(models.Model):
                 "%s@%s:%s" % (host.username, host.url, path),
                 path,
             ]
-            logger.debug("%s\nexited with status: %s", " ".join(rsync_call), out)
+            logger.debug("%s", " ".join(rsync_call))
             try:
                 out = subprocess.call(rsync_call)
             except Exception, e:
