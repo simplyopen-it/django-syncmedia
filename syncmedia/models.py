@@ -37,8 +37,11 @@ class Host(models.Model):
             os.path.join(pwd.getpwnam(self.username).pw_dir, ".ssh", "id_rsa"))
 
     def kill(self, host=None, timeout=DEF_TIMEOUT):
+        shell = False
         if host is None:
-            command = ['/bin/bash', '-c', '''"%s"''' % COM_RELOAD]
+            command = ['''%s''' % COM_RELOAD]
+            # This is needed to have the subprocess accept command pipelines
+            shell = True
         else:
             command = [
                 '/usr/bin/ssh',
@@ -51,7 +54,7 @@ class Host(models.Model):
             ]
         logger.debug("%s", " ".join(command))
         try:
-            ret = subprocess.call(command)
+            ret = subprocess.call(command, shell=shell)
         except Exception, e:
             logger.error(e)
             ret = e.errno
