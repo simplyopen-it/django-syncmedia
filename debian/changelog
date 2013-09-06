@@ -1,3 +1,9 @@
+django-syncmedia (0.1.6-1) stable; urgency=low
+
+  * release v0.1.6
+
+ -- Matteo Atti <attuch@gmail.com>  Fri, 06 Jul 2013 11:49:51 +0200
+
 django-syncmedia (0.1.5-1) stable; urgency=low
 
   * release 0.1.5
