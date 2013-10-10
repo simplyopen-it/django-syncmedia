@@ -6,12 +6,8 @@ import os
 from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.log import getLogger
 from syncmedia.models import Host
 from socket import getfqdn
-
-logger = getLogger("syncmedia.sync_media")
-
 
 class Command(BaseCommand):
 
