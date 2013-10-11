@@ -9,6 +9,6 @@ Package: python-django-syncmedia
 Section: python
 Priority: extra
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-django (>= 1.4), python-psutil, ssh, rsync, sudo,
+Depends: ${misc:Depends}, ${python:Depends}, python-django (>= 1.4), python-psutil, ssh, rsync, sudo
 Description: Allow sync of static files for load balanced systems.
  Sync of static files for load balanced systems.
