@@ -1,3 +1,9 @@
+django-syncmedia (0.1.9+pkg1) UNRELEASED; urgency=low
+
+  * test packaging with sudo
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 11 Oct 2013 12:08:47 +0200
+
 django-syncmedia (0.1.9) stable; urgency=low
 
   * v0.1.9
