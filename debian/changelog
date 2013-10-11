@@ -1,3 +1,9 @@
+django-syncmedia (0.1.10) unstable; urgency=low
+
+  * v0.1.10
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Fri, 11 Oct 2013 12:48:01 +0200
+
 django-syncmedia (0.1.9+pkg1) UNRELEASED; urgency=low
 
   * test packaging with sudo
