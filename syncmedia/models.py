@@ -66,6 +66,10 @@ class Host(models.Model):
         return ret
 
     def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+        thread = Thread(target=self._push, args=(sync_dirs, timeout, kill))
+        thread.start()
+
+    def _push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
         ''' Rsync push to others hosts.
 
         Parameters
@@ -101,6 +105,7 @@ class Host(models.Model):
                 logger.debug("%s", " ".join(rsync_call))
                 try:
                     out = subprocess.call(rsync_call)
+                    # out = subprocess.Popen(rsync_call)
                 except Exception, e:
                     logger.error(e)
                     continue
@@ -116,6 +121,10 @@ class Host(models.Model):
         return ret
 
     def pull(self, host=None, sync_dirs=None, timeout=10, kill=False):
+        thread = Thread(target=self._pull, args=(host, sync_dirs, timeout, kill))
+        thread.start()
+
+    def _pull(self, host=None, sync_dirs=None, timeout=10, kill=False):
         ''' Rsync pull to others hosts.
 
         Parameters
