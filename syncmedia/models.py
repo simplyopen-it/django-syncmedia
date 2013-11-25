@@ -14,7 +14,7 @@ from syncmedia import reload_commands
 logger = getLogger("syncmedia.models")
 
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
-PROJECT_PATH = getattr(settings, "PROJECT_PATH", '/var/www/***REMOVED***')
+PROJECT_PATH = getattr(settings, "PROJECT_PATH")
 COM_RELOAD = getattr(settings, "COMM_RELOAD", reload_commands.GUNICORN_WSGI)
 DEF_TIMEOUT = 10 # ssh timeout in seconds
 
