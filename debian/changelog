@@ -1,3 +1,9 @@
+django-syncmedia (0.1.13) unstable; urgency=low
+
+  * v0.1.13
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Wed, 27 Nov 2013 16:21:52 +0100
+
 django-syncmedia (0.1.12) unstable; urgency=low
 
   * 0.1.12
