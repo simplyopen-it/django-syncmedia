@@ -67,8 +67,17 @@ class Host(models.Model):
         return ret
 
     def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+        ''' Run _push() in a separate thread, to be called from django
+        modules to avoid waiting syncronization when uploading a file.
+        '''
         thread = Thread(target=self._push, args=(sync_dirs, timeout, kill))
         thread.start()
+
+    def command_push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+        ''' Wrapper method to call _push() from a management command
+        script.
+        '''
+        return self._push(sync_dirs=sync_dirs, timeout=timeout, kill=kill)
 
     def _push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
         ''' Rsync push to others hosts.
@@ -121,11 +130,20 @@ class Host(models.Model):
                     ret[host.url].append( (sync_dir, False) )
         return ret
 
-    def pull(self, host=None, sync_dirs=None, timeout=10, kill=False):
+    def pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+        ''' Run _pull() in a separate thread, to be called from django
+        modules to avoid waiting syncronization when uploading a file.
+        '''
         thread = Thread(target=self._pull, args=(host, sync_dirs, timeout, kill))
         thread.start()
 
-    def _pull(self, host=None, sync_dirs=None, timeout=10, kill=False):
+    def command_pull(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+        ''' Wrapper method to call _pull() from a management command
+        script.
+        '''
+        return self._pull(sync_dirs=sync_dirs, timeout=timeout, kill=kill)
+
+    def _pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
         ''' Rsync pull to others hosts.
 
         Parameters
