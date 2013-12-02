@@ -115,11 +115,10 @@ class Host(models.Model):
                     "%s@%s:%s" % (host.username, host.url, path),
                 ]
                 if exclude:
-                    rsync_call.insert(1, "--exclude=\"%s\"")
+                    rsync_call.insert(1, '''--exclude=%s''' % exclude)
                 logger.debug("%s", " ".join(rsync_call))
                 try:
                     out = subprocess.call(rsync_call)
-                    # out = subprocess.Popen(rsync_call)
                 except Exception, e:
                     logger.error(e)
                     continue
@@ -190,7 +189,7 @@ class Host(models.Model):
                 path,
             ]
             if exclude:
-                rsync_call.insert(1, "--exclude=\"%s\"")
+                rsync_call.insert(1, '''--exclude=%s''' % exclude)
             logger.debug("%s", " ".join(rsync_call))
             try:
                 out = subprocess.call(rsync_call)
