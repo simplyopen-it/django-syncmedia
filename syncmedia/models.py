@@ -66,20 +66,20 @@ class Host(models.Model):
                            host, ret)
         return ret
 
-    def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+    def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
         ''' Run _push() in a separate thread, to be called from django
         modules to avoid waiting syncronization when uploading a file.
         '''
-        thread = Thread(target=self._push, args=(sync_dirs, timeout, kill))
+        thread = Thread(target=self._push, args=(sync_dirs, timeout, kill, exclude))
         thread.start()
 
-    def command_push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+    def command_push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
         ''' Wrapper method to call _push() from a management command
         script.
         '''
-        return self._push(sync_dirs=sync_dirs, timeout=timeout, kill=kill)
+        return self._push(sync_dirs=sync_dirs, timeout=timeout, kill=kill, exclude=exclude)
 
-    def _push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+    def _push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
         ''' Rsync push to others hosts.
 
         Parameters
@@ -88,6 +88,8 @@ class Host(models.Model):
             PROJECT_PATH).
         timeout: timeout in seconds for ssh connection.
         kill: if True call a remote command to restart the server.
+        exclude: exclude parameter to pass to rsync (default: exclude
+            hidden files).
 
         Returns
         -------
@@ -112,6 +114,8 @@ class Host(models.Model):
                     path,
                     "%s@%s:%s" % (host.username, host.url, path),
                 ]
+                if exclude:
+                    rsync_call.insert(1, "--exclude=\"%s\"")
                 logger.debug("%s", " ".join(rsync_call))
                 try:
                     out = subprocess.call(rsync_call)
@@ -130,20 +134,20 @@ class Host(models.Model):
                     ret[host.url].append( (sync_dir, False) )
         return ret
 
-    def pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+    def pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
         ''' Run _pull() in a separate thread, to be called from django
         modules to avoid waiting syncronization when uploading a file.
         '''
-        thread = Thread(target=self._pull, args=(host, sync_dirs, timeout, kill))
+        thread = Thread(target=self._pull, args=(host, sync_dirs, timeout, kill, exclude))
         thread.start()
 
-    def command_pull(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+    def command_pull(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
         ''' Wrapper method to call _pull() from a management command
         script.
         '''
-        return self._pull(sync_dirs=sync_dirs, timeout=timeout, kill=kill)
+        return self._pull(sync_dirs=sync_dirs, timeout=timeout, kill=kill, exclude=exclude)
 
-    def _pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False):
+    def _pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
         ''' Rsync pull to others hosts.
 
         Parameters
@@ -154,6 +158,8 @@ class Host(models.Model):
             PROJECT_PATH).
         timeout: timeout in seconds for ssh connection.
         kill: if True call a command to restart the local server.
+        exclude: exclude parameter to pass to rsync (default: exclude
+            hidden files).
 
         Returns
         -------
@@ -183,6 +189,8 @@ class Host(models.Model):
                 "%s@%s:%s" % (host.username, host.url, path),
                 path,
             ]
+            if exclude:
+                rsync_call.insert(1, "--exclude=\"%s\"")
             logger.debug("%s", " ".join(rsync_call))
             try:
                 out = subprocess.call(rsync_call)
