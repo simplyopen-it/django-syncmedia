@@ -42,7 +42,7 @@ if [[ ! -d "$BUILD" ]]; then
 fi
 
 if [[ $CHANGELOG -gt 0 ]]; then
-    git-dch --git-author --debian-tag=$VESTION_FORMAT -a --spawn-editor=always $RELEASE --commit && \
+    git-dch --git-author --debian-tag=$VERSION_FORMAT -a --spawn-editor=always $RELEASE --commit && \
 	git-buildpackage -us -uc --git-ignore-new --git-export-dir=$BUILD --git-debian-tag=$VERSION_FORMAT $GITRELEASE $RETAG
     if [[ x$RETAG != "x" ]]; then
 	git push && git push --tags
