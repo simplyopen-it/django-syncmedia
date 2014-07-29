@@ -23,12 +23,8 @@ class Command(BaseCommand):
     )
 
     help = "Rsync of media files with other host running the same application"
-    synopsis = "init|unregister|push|pull [-u USERNAME|--username=USERNAME] [-k KEYPATH|--keypath=KEYPATH] [-p PORT|--port=PORT] [-i|--interactive]"
 
     def handle(self, *args, **options):
-        if len(args) < 1:
-            self.stdout.write("./run.py sync_media %s" % Command.synopsis)
-            sys.exit(1)
         action = args[0]
         username = options.get('username', None)
         keypath = options.get('keypath', None)

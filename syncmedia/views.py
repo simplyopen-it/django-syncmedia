@@ -65,14 +65,13 @@ class SyncKeys(GenericProtectedView):
 
 class SyncMediaView(StaffProtectedView, GenericProtectedView):
     use_login_required_decorator = True
-    ''' TO WRITE '''
 
     def get(self, request, *args, **kwargs):
         if request.GET.get('type') and request.GET.get('kill'):
             ex_type = request.GET.get('type')
             host = Host.objects.get_this()
             func = getattr(host, ex_type, 'push')
-            kill = request.GET.get('kill') == 'True' or False
+            kill = request.GET.get('kill') == 'True'
             func(sync_dirs=getattr(settings, 'SYNCHRO_DIRS', 'locale/'), kill=kill)
             if kill:
                 host.kill()
