@@ -34,7 +34,7 @@ class StaffProtectedView(View):
 class SyncKeys(GenericProtectedView):
     use_login_required_decorator = False
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs): # pylint: disable=W0613
         hid = request.POST.get('id')
         hurl = request.META.get('SERVER_NAME')
         if not Host.objects.filter(url=hurl).exists():
@@ -46,16 +46,13 @@ class SyncKeys(GenericProtectedView):
             logger.warning("Invalid sync post received; id = %s", hid)
         else:
             curr_host = Host.objects.get_this()
-            auth_keys = open(
-                os.path.join(pwd.getpwnam(curr_host.username).pw_dir, ".ssh", "authorized_keys"),
-                'a')
-            try:
-                auth_keys.write(host.pubkey)
-            except Exception, e:
-                logger.warning(e)
-                raise e
-            finally:
-                auth_keys.close()
+            authorized_keys = os.path.join(pwd.getpwnam(curr_host.username).pw_dir,
+                                           ".ssh", "authorized_keys")
+            with open(authorized_keys, 'r') as auth_fd:
+                registered_keys = auth_fd.readlines()
+            if host.pubkey not in registered_keys:
+                with open(authorized_keys, 'a') as auth_fd:
+                    auth_fd.write(host.pubkey)
         return HttpResponseRedirect('/')
 
     @csrf_exempt

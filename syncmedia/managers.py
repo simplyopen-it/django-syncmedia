@@ -57,7 +57,7 @@ class HostManager(models.Manager):
         if key is None:
             key = os.path.join(home_ssh, 'id_rsa.pub')
         if os.path.isfile(key):
-            # It's a file containinge (hopefully) the key
+            # It's a file containing (hopefully) the key
             key_fd = open(key, 'r')
             try:
                 rsa_pub = key_fd.read()
@@ -87,25 +87,14 @@ class HostManager(models.Manager):
             created = True
         this_host.save()
         other_hosts = self.all().exclude(id=this_host.id)
-        # Get other Host's keys
+        # Get other Host's keys (exclude already present ones)
         with open(os.path.join(home_ssh, "authorized_keys"), 'r') as auth_fd:
             registered_keys = auth_fd.readlines()
-        print registered_keys
         pubkeys = [elem.get('pubkey')
                    for elem in other_hosts.exclude(pubkey__in=registered_keys).values('pubkey')]
-
-        # # write keys to authorized_keys
-        # auth_fd = open(os.path.join(home_ssh, "authorized_keys"), 'a')
-        # try:
-        #     for pubkey in pubkeys:
-        #         auth_fd.write("%s" % pubkey)
-        # finally:
-        #     auth_fd.close()
-
         with open(os.path.join(home_ssh, "authorized_keys"), 'a') as auth_fd:
             for pubkey in pubkeys:
                 auth_fd.write("%s" % pubkey)
-
         # Notify other Hosts
         for host in other_hosts:
             self._notify(this_host, host)
