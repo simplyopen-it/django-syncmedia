@@ -88,14 +88,24 @@ class HostManager(models.Manager):
         this_host.save()
         other_hosts = self.all().exclude(id=this_host.id)
         # Get other Host's keys
-        pubkeys = [elem.get('pubkey') for elem in other_hosts.values('pubkey')]
-        # write keys to authorized_keys
-        auth_fd = open(os.path.join(home_ssh, "authorized_keys"), 'a')
-        try:
+        with open(os.path.join(home_ssh, "authorized_keys"), 'r') as auth_fd:
+            registered_keys = auth_fd.readlines()
+        print registered_keys
+        pubkeys = [elem.get('pubkey')
+                   for elem in other_hosts.exclude(pubkey__in=registered_keys).values('pubkey')]
+
+        # # write keys to authorized_keys
+        # auth_fd = open(os.path.join(home_ssh, "authorized_keys"), 'a')
+        # try:
+        #     for pubkey in pubkeys:
+        #         auth_fd.write("%s" % pubkey)
+        # finally:
+        #     auth_fd.close()
+
+        with open(os.path.join(home_ssh, "authorized_keys"), 'a') as auth_fd:
             for pubkey in pubkeys:
                 auth_fd.write("%s" % pubkey)
-        finally:
-            auth_fd.close()
+
         # Notify other Hosts
         for host in other_hosts:
             self._notify(this_host, host)
