@@ -8,6 +8,7 @@ from socket import gethostname, getfqdn
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.utils.log import getLogger
+from syncmedia import authorized_keys
 
 logger = getLogger("syncmedia.manager")
 
@@ -88,13 +89,9 @@ class HostManager(models.Manager):
         this_host.save()
         other_hosts = self.all().exclude(id=this_host.id)
         # Get other Host's keys (exclude already present ones)
-        with open(os.path.join(home_ssh, "authorized_keys"), 'r') as auth_fd:
-            registered_keys = auth_fd.readlines()
         pubkeys = [elem.get('pubkey')
-                   for elem in other_hosts.exclude(pubkey__in=registered_keys).values('pubkey')]
-        with open(os.path.join(home_ssh, "authorized_keys"), 'a') as auth_fd:
-            for pubkey in pubkeys:
-                auth_fd.write("%s" % pubkey)
+                   for elem in other_hosts.values('pubkey')]
+        authorized_keys.add_keys(pubkeys, os.path.join(home_ssh, "authorized_keys"))
         # Notify other Hosts
         for host in other_hosts:
             self._notify(this_host, host)

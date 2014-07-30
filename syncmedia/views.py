@@ -8,8 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from syncmedia.models import Host
 from django.conf import settings
-
-from socket import gethostname
+from syncmedia import authorized_keys
 import os
 import pwd
 
@@ -46,13 +45,10 @@ class SyncKeys(GenericProtectedView):
             logger.warning("Invalid sync post received; id = %s", hid)
         else:
             curr_host = Host.objects.get_this()
-            authorized_keys = os.path.join(pwd.getpwnam(curr_host.username).pw_dir,
+            auth_path = os.path.join(pwd.getpwnam(curr_host.username).pw_dir,
                                            ".ssh", "authorized_keys")
-            with open(authorized_keys, 'r') as auth_fd:
-                registered_keys = auth_fd.readlines()
-            if host.pubkey not in registered_keys:
-                with open(authorized_keys, 'a') as auth_fd:
-                    auth_fd.write(host.pubkey)
+            authorized_keys.add_key(host.pubkey, auth_path)
+
         return HttpResponseRedirect('/')
 
     @csrf_exempt
