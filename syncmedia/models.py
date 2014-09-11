@@ -106,7 +106,7 @@ class Host(models.Model):
         for host in hosts:
 
             to_sync = set(sync_dirs)
-            if host.sync_dirs is not None:
+            if host.sync_dirs:
                 to_sync = set(host.sync_dirs).intersection(to_sync)
 
             ret[host.url] = []
