@@ -16,6 +16,22 @@ CHANGELOG=1
 BRANCH=""
 # Version format used intag names
 VERSION_FORMAT='v%(version)s'
+RELEASE_BRANCH='release'
+BUILD_COMMAND="sbuild -A -s -c wheezy-amd64-sbuild"
+
+usage() {
+    echo
+    echo $(basename $0) [options] [tag]
+    echo "-b <build dir>"
+    echo -e "\tbuild directory (default: $BUILD)"
+    echo "-R, --release"
+    echo -e "\tMake a release build"
+    echo "-c <command>"
+    echo -e "\tbuild command (default $BUILD_COMMAND)"
+    echo "-h, --help"
+    echo -e "\tshow this help and exit"
+    exit 0
+}
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -28,9 +44,16 @@ while [[ $# -gt 0 ]]; do
 	    RETAG="--git-tag --git-retag"
 	    GITRELEASE=""
 	    ;;
+	"-c")
+	    shift
+	    BUILD_COMMAND="$1"
+	    ;;
+	"-h"|"--help")
+	    usage
+	    ;;
 	*) # Commit / tag / branch
 	    CHANGELOG=0
-	    BRANCH="--git-export=$1"
+	    BRANCH="$1"
 	    ;;
     esac
     shift
@@ -42,13 +65,40 @@ if [[ ! -d "$BUILD" ]]; then
 fi
 
 if [[ $CHANGELOG -gt 0 ]]; then
-    git-dch --git-author --debian-tag=$VERSION_FORMAT -a --spawn-editor=always $RELEASE --commit && \
-	git-buildpackage -us -uc --git-ignore-new --git-export-dir=$BUILD --git-debian-tag=$VERSION_FORMAT $GITRELEASE $RETAG
+    # Update changelog and, if edit successfully, commit
+    git-dch -a \
+	--git-author \
+	--debian-tag=$VERSION_FORMAT \
+	--debian-branch=$RELEASE_BRANCH \
+	--spawn-editor=always $RELEASE \
+	--commit
+
+    if [[ $? -eq 0 ]]; then
+	git-buildpackage \
+	    --git-builder="$BUILD_COMMAND" \
+	    --git-ignore-new \
+	    --git-export-dir=$BUILD \
+	    --git-debian-branch=$RELEASE_BRANCH \
+	    --git-debian-tag=$VERSION_FORMAT $GITRELEASE $RETAG
+    else
+	exit $?
+    fi
+
     if [[ x$RETAG != "x" ]]; then
+	# This is a release version.
+	# New tag present, we can push it
 	git push && git push --tags
     fi
+
 else
-    git-buildpackage -us -uc --git-ignore-new --git-export-dir=$BUILD $BRANCH --git-debian-tag=$VERSION_FORMAT
+    # Rebuilding an existing tag
+    git-buildpackage \
+	--git-builder="$BUILD_COMMAND" \
+	--git-ignore-new \
+	--git-export-dir=$BUILD \
+	--git-export=$BRANCH \
+	--git-upstream-tree=$BRANCH \
+	--git-debian-tag=$VERSION_FORMAT
 fi
 
 exit 0
