@@ -1,3 +1,25 @@
+django-syncmedia (0.1.16~1.gbp54ab43) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @54ab433523f321074b1f8527d03a7f4e763d0504 **
+
+  [ Marco Pattaro ]
+  * auto push new tags
+  * fix typo
+  * cleanup
+  * avoid repeated entries in authorized_keys
+  * avoid to repeat entry for notified hosts too
+  * mini library to handle ssh authorized keys
+  * fix missing key recongnition because of newline chars
+
+  [ Marco Bardelli ]
+  * use dh_python2
+
+  [ Marco Pattaro ]
+  * can specify direcotry to sync per host
+  * update build.sh
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Thu, 11 Sep 2014 16:34:54 +0200
+
 django-syncmedia (0.1.15) unstable; urgency=low
 
   * v0.1.15
