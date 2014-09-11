@@ -10,6 +10,7 @@ from django.utils.log import getLogger
 from django.conf import settings
 from syncmedia import managers
 from syncmedia import reload_commands
+from django_extensions.db.fields.json import JSONField
 
 logger = getLogger("syncmedia.models")
 
@@ -25,6 +26,7 @@ class Host(models.Model):
     port = models.IntegerField(max_length=40, default=9922)
     username = models.CharField(max_length=256, blank=True, null=True)
     pubkey = models.CharField(max_length=512)
+    sync_dirs = JSONField(blank=True, null=True)
 
     objects = managers.HostManager()
 
@@ -102,8 +104,14 @@ class Host(models.Model):
         hosts = Host.objects.all().exclude(url=self.url)
         ret = {}
         for host in hosts:
+
+            to_sync = set(sync_dirs)
+            if host.sync_dirs is not None:
+                to_sync = set(host.sync_dirs).intersection(to_sync)
+
             ret[host.url] = []
-            for sync_dir in sync_dirs:
+            # for sync_dir in sync_dirs:
+            for sync_dir in to_sync:
                 path = os.path.join(PROJECT_PATH, sync_dir)
                 rsync_call = [
                     '/usr/bin/rsync',

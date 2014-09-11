@@ -1,0 +1,11 @@
+* TODO let the Host table resides on a separate DB than the django site default
+  + define a settings variable SYNCMEDIA_DB (default to the global db)
+  + apply ORM operation to the SYNCMEDIA_DB
+    - initializa()
+    - unregister()
+    - get_this()
+    - ... all other Manager methods
+
+* TODO Host objects should be allowed to specify the base path to sync to.
+  - By defayult each synced path is relative to PROJECT_PATH, but on
+    some Hosts it might be userfull to specify a different one.
