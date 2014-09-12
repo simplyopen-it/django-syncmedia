@@ -46,6 +46,10 @@ class Host(models.Model):
         if errors:
             raise ValidationError(errors)
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Host, self).save(*args, **kwargs)
+
     @property
     def path_rsa(self):
         return getattr(
