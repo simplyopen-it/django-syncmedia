@@ -4,16 +4,17 @@ import pwd
 import subprocess
 import random
 from threading import Thread
-
+from syncmedia import managers
+from syncmedia import reload_commands
 from django.db import models
 from django.utils.log import getLogger
 from django.conf import settings
-from syncmedia import managers
-from syncmedia import reload_commands
 from django_extensions.db.fields.json import JSONField
+from django.core.exceptions import ValidationError
 
 logger = getLogger("syncmedia.models")
 
+# FIXME: May it would be better to keep an empty string as default
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH")
 COM_RELOAD = getattr(settings, "COMM_RELOAD", reload_commands.GUNICORN_WSGI)
@@ -27,11 +28,23 @@ class Host(models.Model):
     username = models.CharField(max_length=256, blank=True, null=True)
     pubkey = models.CharField(max_length=512)
     sync_dirs = JSONField() # pylint: disable=E1120
+    root_path = models.CharField(max_length=512, blank=True, null=True)
 
     objects = managers.HostManager()
 
     def __unicode__(self):
         return str(" ").join([self.hostname, self.url])
+
+    def clean_fields(self, exclude=None):
+        errors = {}
+        try:
+            super(Host, self).clean_fields(exclude=exclude)
+        except ValueError as e:
+            errors = e.message_dict
+        if (self.root_path is not None) and (not os.path.isabs(self.root_path)):
+            errors['root_path'] = ['root_path must be an absolute path.']
+        if errors:
+            raise ValidationError(errors)
 
     @property
     def path_rsa(self):
@@ -110,22 +123,26 @@ class Host(models.Model):
             sync_dirs = SYNC_DIRS
         hosts = Host.objects.all().exclude(url=self.url)
         ret = {}
+        src_root = self.root_path or PROJECT_PATH
         for host in hosts:
             # Select only directories allowed for this host
             to_sync = set(sync_dirs)
             if host.sync_dirs:
                 to_sync = set(host.sync_dirs).intersection(to_sync)
+            dest_root = host.root_path or PROJECT_PATH
             ret[host.url] = []
             for sync_dir in to_sync:
-                path = os.path.join(PROJECT_PATH, sync_dir)
+                # path = os.path.join(PROJECT_PATH, sync_dir)
+                src_path = os.path.join(src_root, sync_dir)
+                dest_path = os.path.join(dest_root, sync_dir)
                 rsync_call = [
                     '/usr/bin/rsync',
                     '-r',
                     '-e',
                     "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
                     (timeout, host.port, self.path_rsa),
-                    path,
-                    "%s@%s:%s" % (host.username, host.url, path),
+                    src_path,
+                    "%s@%s:%s" % (host.username, host.url, dest_path),
                 ]
                 if exclude:
                     rsync_call.insert(1, '''--exclude=%s''' % exclude)
@@ -186,6 +203,7 @@ class Host(models.Model):
 
         '''
         ret = {}
+        dest_root = self.root_path or PROJECT_PATH
         if host is None:
             # Get the host to pull from.
             # We need to be sure that the host we are going to pull
@@ -199,18 +217,21 @@ class Host(models.Model):
             else:
                 logger.warning("No other hosts found... nothing to do.")
                 return ret
+        src_root = host.root_path or PROJECT_PATH
         if sync_dirs is None:
             sync_dirs = SYNC_DIRS
         for sync_dir in sync_dirs:
-            path = os.path.join(PROJECT_PATH, sync_dir)
+            # path = os.path.join(PROJECT_PATH, sync_dir)
+            src_path = os.path.join(src_root, sync_dir)
+            dest_path = os.path.join(dest_root, sync_dir)
             rsync_call = [
                 '/usr/bin/rsync',
                 '-r',
                 '-e',
                 "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
                 (timeout, host.port, self.path_rsa),
-                "%s@%s:%s" % (host.username, host.url, path),
-                path,
+                "%s@%s:%s" % (host.username, host.url, src_path),
+                dest_path,
             ]
             if exclude:
                 rsync_call.insert(1, '''--exclude=%s''' % exclude)
