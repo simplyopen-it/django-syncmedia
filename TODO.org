@@ -1,4 +1,4 @@
-* TODO [#A] pull() method also should be aware of per host directories
+* DONE [#A] pull() method also should be aware of per host directories
   - Just to avoid surely failure dirs (or accidental delete!)
 
 * TODO [#B] Host objects should be allowed to specify the base path to sync to.

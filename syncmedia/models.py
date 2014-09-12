@@ -68,20 +68,27 @@ class Host(models.Model):
                            host, ret)
         return ret
 
-    def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
+    def push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False,
+             exclude=".*"):
         ''' Run _push() in a separate thread, to be called from django
         modules to avoid waiting syncronization when uploading a file.
         '''
-        thread = Thread(target=self._push, args=(sync_dirs, timeout, kill, exclude))
+        thread = Thread(
+            target=self._push,
+            args=(sync_dirs, timeout, kill, exclude))
         thread.start()
 
-    def command_push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
+    def command_push(self, sync_dirs=None, timeout=DEF_TIMEOUT,
+                     kill=False, exclude=".*"):
         ''' Wrapper method to call _push() from a management command
         script.
         '''
-        return self._push(sync_dirs=sync_dirs, timeout=timeout, kill=kill, exclude=exclude)
+        return self._push(
+            sync_dirs=sync_dirs,
+            timeout=timeout, kill=kill, exclude=exclude)
 
-    def _push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
+    def _push(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False,
+              exclude=".*"):
         ''' Rsync push to others hosts.
 
         Parameters
@@ -108,7 +115,6 @@ class Host(models.Model):
             to_sync = set(sync_dirs)
             if host.sync_dirs:
                 to_sync = set(host.sync_dirs).intersection(to_sync)
-
             ret[host.url] = []
             for sync_dir in to_sync:
                 path = os.path.join(PROJECT_PATH, sync_dir)
@@ -140,20 +146,26 @@ class Host(models.Model):
                     ret[host.url].append( (sync_dir, False) )
         return ret
 
-    def pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
+    def pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT,
+             kill=False, exclude=".*"):
         ''' Run _pull() in a separate thread, to be called from django
         modules to avoid waiting syncronization when uploading a file.
         '''
-        thread = Thread(target=self._pull, args=(host, sync_dirs, timeout, kill, exclude))
+        thread = Thread(
+            target=self._pull,
+            args=(host, sync_dirs, timeout, kill, exclude))
         thread.start()
 
-    def command_pull(self, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
+    def command_pull(self, sync_dirs=None, timeout=DEF_TIMEOUT,
+                     kill=False, exclude=".*"):
         ''' Wrapper method to call _pull() from a management command
         script.
         '''
-        return self._pull(sync_dirs=sync_dirs, timeout=timeout, kill=kill, exclude=exclude)
+        return self._pull(sync_dirs=sync_dirs, timeout=timeout,
+                          kill=kill, exclude=exclude)
 
-    def _pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT, kill=False, exclude=".*"):
+    def _pull(self, host=None, sync_dirs=None, timeout=DEF_TIMEOUT,
+              kill=False, exclude=".*"):
         ''' Rsync pull to others hosts.
 
         Parameters
@@ -175,7 +187,12 @@ class Host(models.Model):
         '''
         ret = {}
         if host is None:
-            hosts = Host.objects.all().exclude(url=self.url)
+            # Get the host to pull from.
+            # We need to be sure that the host we are going to pull
+            # from has all the directories we want to sync.
+            # TODO: if sync_dirs is not None it make sense to find
+            # intersections.
+            hosts = Host.objects.exclude(url=self.url).filter(sync_dirs=u'{}')
             if hosts.exists():
                 idx = random.randint(0, hosts.count() - 1)
                 host = hosts[idx]
