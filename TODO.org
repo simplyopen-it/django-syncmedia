@@ -1,7 +1,7 @@
 * DONE [#A] pull() method also should be aware of per host directories
   - Just to avoid surely failure dirs (or accidental delete!)
 
-* TODO [#B] Host objects should be allowed to specify the base path to sync to.
+* DONE [#B] Host objects should be allowed to specify the base path to sync to.
   - By defayult each synced path is relative to PROJECT_PATH, but on
     some Hosts it might be userfull to specify a different one.
 
