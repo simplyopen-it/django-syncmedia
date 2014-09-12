@@ -1,6 +1,6 @@
-django-syncmedia (0.1.16~2.gbp0dcd6e) UNRELEASED; urgency=medium
+django-syncmedia (0.1.16~3.gbp8319c1) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @0dcd6e2c898e8d8470285e9c5a918692dda1cc5b **
+  ** SNAPSHOT build @8319c1aabc107dac4d2548e23e5c43eb05ff0d6a **
 
   [ Marco Pattaro ]
   * auto push new tags
@@ -19,6 +19,10 @@ django-syncmedia (0.1.16~2.gbp0dcd6e) UNRELEASED; urgency=medium
   * update build.sh
   * Update changelog for 0.1.16~1.gbp54ab43 release
   * fix test on values of Host.sync_dirs
+  * Update changelog for 0.1.16~2.gbp0dcd6e release
+  * allow symd dirs per host
+  * pull avoid host with configured sync_dirs
+  * add root_path to host model
 
  -- Marco Pattaro <mpattaro@gmail.com>  Thu, 11 Sep 2014 16:34:54 +0200
 
