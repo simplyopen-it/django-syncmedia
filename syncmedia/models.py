@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 
 logger = getLogger("syncmedia.models")
 
-# FIXME: May it would be better to keep an empty string as default
+# FIXME: Maybe it would be better to keep an empty string as default
 SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
 PROJECT_PATH = getattr(settings, "PROJECT_PATH")
 COM_RELOAD = getattr(settings, "COMM_RELOAD", reload_commands.GUNICORN_WSGI)
@@ -27,7 +27,7 @@ class Host(models.Model):
     port = models.IntegerField(max_length=40, default=9922)
     username = models.CharField(max_length=256, blank=True, null=True)
     pubkey = models.CharField(max_length=512)
-    sync_dirs = JSONField() # pylint: disable=E1120
+    sync_dirs = JSONField(blank=True, null=True) # pylint: disable=E1120,E1123
     root_path = models.CharField(max_length=512, blank=True, null=True)
 
     objects = managers.HostManager()
@@ -41,7 +41,7 @@ class Host(models.Model):
             super(Host, self).clean_fields(exclude=exclude)
         except ValueError as e:
             errors = e.message_dict
-        if (self.root_path is not None) and (not os.path.isabs(self.root_path)):
+        if self.root_path and not os.path.isabs(self.root_path):
             errors['root_path'] = ['root_path must be an absolute path.']
         if errors:
             raise ValidationError(errors)
@@ -136,7 +136,6 @@ class Host(models.Model):
             dest_root = host.root_path or PROJECT_PATH
             ret[host.url] = []
             for sync_dir in to_sync:
-                # path = os.path.join(PROJECT_PATH, sync_dir)
                 src_path = os.path.join(src_root, sync_dir)
                 dest_path = os.path.join(dest_root, sync_dir)
                 rsync_call = [
@@ -225,7 +224,6 @@ class Host(models.Model):
         if sync_dirs is None:
             sync_dirs = SYNC_DIRS
         for sync_dir in sync_dirs:
-            # path = os.path.join(PROJECT_PATH, sync_dir)
             src_path = os.path.join(src_root, sync_dir)
             dest_path = os.path.join(dest_root, sync_dir)
             rsync_call = [
