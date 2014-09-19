@@ -27,7 +27,7 @@ class Host(models.Model):
     port = models.IntegerField(max_length=40, default=9922)
     username = models.CharField(max_length=256, blank=True, null=True)
     pubkey = models.CharField(max_length=512)
-    sync_dirs = JSONField(blank=True, null=True) # pylint: disable=E1120,E1123
+    sync_dirs = JSONField(blank=True, null=True, default='[]') # pylint: disable=E1120,E1123
     root_path = models.CharField(max_length=512, blank=True, null=True)
 
     objects = managers.HostManager()
