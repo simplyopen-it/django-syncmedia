@@ -1,6 +1,4 @@
-django-syncmedia (0.1.16~3.gbp8319c1) UNRELEASED; urgency=medium
-
-  ** SNAPSHOT build @8319c1aabc107dac4d2548e23e5c43eb05ff0d6a **
+django-syncmedia (0.2) unstable; urgency=medium
 
   [ Marco Pattaro ]
   * auto push new tags
@@ -10,11 +8,6 @@ django-syncmedia (0.1.16~3.gbp8319c1) UNRELEASED; urgency=medium
   * avoid to repeat entry for notified hosts too
   * mini library to handle ssh authorized keys
   * fix missing key recongnition because of newline chars
-
-  [ Marco Bardelli ]
-  * use dh_python2
-
-  [ Marco Pattaro ]
   * can specify direcotry to sync per host
   * update build.sh
   * Update changelog for 0.1.16~1.gbp54ab43 release
@@ -23,8 +16,16 @@ django-syncmedia (0.1.16~3.gbp8319c1) UNRELEASED; urgency=medium
   * allow symd dirs per host
   * pull avoid host with configured sync_dirs
   * add root_path to host model
+  * Update changelog for 0.1.16~3.gbp8319c1 release
+  * call full_clean on pre_save
+  * Fields validation should work as expeced now
+  * update build.sh
+  * update todo
 
- -- Marco Pattaro <mpattaro@gmail.com>  Thu, 11 Sep 2014 16:34:54 +0200
+  [ Marco Bardelli ]
+  * use dh_python2
+
+ -- Michele Totaro <michele@***REMOVED***.com>  Fri, 19 Sep 2014 13:23:55 +0000
 
 django-syncmedia (0.1.15) unstable; urgency=low
 
