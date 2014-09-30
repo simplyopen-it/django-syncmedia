@@ -252,3 +252,19 @@ class Host(models.Model):
                 logger.info("pull of %s from %s FAILED", sync_dir, host)
                 ret[sync_dir] = False
         return ret
+
+
+from django.db.models.signals import post_save, post_delete
+from django.core.exceptions import ObjectDoesNotExist
+MODELS_SYNC = getattr(settings, 'MODELS_SYNC', {})
+
+def push(sender, **kw):
+    key = '.'.join([sender.__module__, sender.__name__])
+    if key in MODELS_SYNC.keys():
+        kwargs = MODELS_SYNC[key]
+        try:
+            Host.objects.get_this().push(**kwargs)
+        except ObjectDoesNotExist, e:
+            logger.error(e)
+post_save.connect(push)
+post_delete.connect(push)
