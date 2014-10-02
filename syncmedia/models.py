@@ -127,17 +127,15 @@ class Host(models.Model):
             sync_dirs = SYNC_DIRS
         hosts = Host.objects.all().exclude(url=self.url)
         ret = {}
-        src_root = self.root_path or PROJECT_PATH
         for host in hosts:
             # Select only directories allowed for this host
             to_sync = set(sync_dirs)
             if host.sync_dirs:
                 to_sync = set(host.sync_dirs).intersection(to_sync)
-            dest_root = host.root_path or PROJECT_PATH
             ret[host.url] = []
             for sync_dir in to_sync:
-                src_path = os.path.join(src_root, sync_dir)
-                dest_path = os.path.join(dest_root, sync_dir)
+                src_path = os.path.join(self.root_path, sync_dir) if self.root_path else os.path.abspath(sync_dir)
+                dest_path = os.path.join(host.root_path, sync_dir) if host.root_path else os.path.abspath(sync_dir)
                 rsync_call = [
                     '/usr/bin/rsync',
                     '-r',
@@ -206,13 +204,10 @@ class Host(models.Model):
 
         '''
         ret = {}
-        dest_root = self.root_path or PROJECT_PATH
         if host is None:
             # Get the host to pull from.
             # We need to be sure that the host we are going to pull
             # from has all the directories we want to sync.
-            # TODO: if sync_dirs is not None it make sense to find
-            # intersections.
             hosts = Host.objects.exclude(url=self.url).filter(sync_dirs=u'{}')
             if hosts.exists():
                 idx = random.randint(0, hosts.count() - 1)
@@ -220,12 +215,11 @@ class Host(models.Model):
             else:
                 logger.warning("No other hosts found... nothing to do.")
                 return ret
-        src_root = host.root_path or PROJECT_PATH
         if sync_dirs is None:
             sync_dirs = SYNC_DIRS
         for sync_dir in sync_dirs:
-            src_path = os.path.join(src_root, sync_dir)
-            dest_path = os.path.join(dest_root, sync_dir)
+            src_path = os.path.join(host.root_path, sync_dir) if host.root_path else os.path.abspath(sync_dir)
+            dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else os.path.abspath(sync_dir)
             rsync_call = [
                 '/usr/bin/rsync',
                 '-r',
