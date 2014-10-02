@@ -2,7 +2,7 @@
 import os
 import pwd
 import subprocess
-import random
+# import random
 from threading import Thread
 from syncmedia import managers
 from syncmedia import reload_commands
@@ -204,62 +204,58 @@ class Host(models.Model):
             indicating wether the rsync succeded or not.
 
         '''
-        ret = {}
-        if host is None:
-            # Get the host to pull from.
-            # We need to be sure that the host we are going to pull
-            # from has all the directories we want to sync.
-            hosts = Host.objects.exclude(url=self.url).filter(sync_dirs=u'{}')
-            if hosts.exists():
-                idx = random.randint(0, hosts.count() - 1)
-                host = hosts[idx]
-            else:
-                logger.warning("No other hosts found... nothing to do.")
-                return ret
+        hosts = [host] if host is not None else Host.objects.all().exclude(url=self.url)
         if sync_dirs is None:
             sync_dirs = SYNC_DIRS
-        for sync_dir in sync_dirs:
-            src_path = os.path.join(host.root_path, sync_dir) if host.root_path else abspath(sync_dir)
-            dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else abspath(sync_dir)
-            rsync_call = [
-                '/usr/bin/rsync',
-                '-r',
-                '-e',
-                "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
-                (timeout, host.port, self.path_rsa),
-                "%s@%s:%s" % (host.username, host.url, src_path),
-                dest_path,
-            ]
-            if exclude:
-                rsync_call.insert(1, '''--exclude=%s''' % exclude)
-            logger.debug("%s", " ".join(rsync_call))
-            try:
-                out = subprocess.call(rsync_call)
-            except Exception, e:
-                logger.error(e)
-                continue
-            if out == 0:
-                logger.info("pull of %s from %s SUCCEDED", sync_dir, host)
-                ret[sync_dir] = True
-                if kill:
-                    self.kill() # Self kill! :D
-            else:
-                logger.info("pull of %s from %s FAILED", sync_dir, host)
-                ret[sync_dir] = False
+        ret = {}
+        for host in hosts:
+            # Select only directories allowed for this host
+            to_sync = set(sync_dirs)
+            if host.sync_dirs:
+                to_sync = set(host.sync_dirs).intersection(to_sync)
+            ret[host.url] = []
+            for sync_dir in sync_dirs:
+                src_path = os.path.join(host.root_path, sync_dir) if host.root_path else abspath(sync_dir)
+                dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else abspath(sync_dir)
+                rsync_call = [
+                    '/usr/bin/rsync',
+                    '-r',
+                    '-e',
+                    "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
+                    (timeout, host.port, self.path_rsa),
+                    "%s@%s:%s" % (host.username, host.url, src_path),
+                    dest_path,
+                ]
+                if exclude:
+                    rsync_call.insert(1, '''--exclude=%s''' % exclude)
+                logger.debug("%s", " ".join(rsync_call))
+                try:
+                    out = subprocess.call(rsync_call)
+                except Exception, e:
+                    logger.error(e)
+                    continue
+                if out == 0:
+                    logger.info("pull of %s from %s SUCCEDED", sync_dir, host)
+                    ret[host.url].append( (sync_dir, True) )
+                else:
+                    logger.info("pull of %s from %s FAILED", sync_dir, host)
+                    ret[host.url].append( (sync_dir, False) )
+        if kill and any([result for _, result in ret.itervalues()]):
+            self.kill() # Self kill! :D
         return ret
 
 
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from django.core.exceptions import ObjectDoesNotExist
 MODELS_SYNC = getattr(settings, 'MODELS_SYNC', {})
 
-def push(sender, **kw):
+def sync(sender, **kw):
     key = '.'.join([sender.__module__, sender.__name__])
     if key in MODELS_SYNC.keys():
         kwargs = MODELS_SYNC[key]
         try:
             Host.objects.get_this().push(**kwargs)
+            Host.objects.get_this().pull(**kwargs)
         except ObjectDoesNotExist, e:
             logger.error(e)
-post_save.connect(push)
-post_delete.connect(push)
+post_save.connect(sync)
