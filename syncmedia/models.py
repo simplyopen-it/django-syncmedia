@@ -6,6 +6,7 @@ import random
 from threading import Thread
 from syncmedia import managers
 from syncmedia import reload_commands
+from syncmedia.utils import abspath
 from django.db import models
 from django.utils.log import getLogger
 from django.conf import settings
@@ -134,8 +135,8 @@ class Host(models.Model):
                 to_sync = set(host.sync_dirs).intersection(to_sync)
             ret[host.url] = []
             for sync_dir in to_sync:
-                src_path = os.path.join(self.root_path, sync_dir) if self.root_path else os.path.abspath(sync_dir)
-                dest_path = os.path.join(host.root_path, sync_dir) if host.root_path else os.path.abspath(sync_dir)
+                src_path = os.path.join(self.root_path, sync_dir) if self.root_path else abspath(sync_dir)
+                dest_path = os.path.join(host.root_path, sync_dir) if host.root_path else abspath(sync_dir)
                 rsync_call = [
                     '/usr/bin/rsync',
                     '-r',
@@ -218,8 +219,8 @@ class Host(models.Model):
         if sync_dirs is None:
             sync_dirs = SYNC_DIRS
         for sync_dir in sync_dirs:
-            src_path = os.path.join(host.root_path, sync_dir) if host.root_path else os.path.abspath(sync_dir)
-            dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else os.path.abspath(sync_dir)
+            src_path = os.path.join(host.root_path, sync_dir) if host.root_path else abspath(sync_dir)
+            dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else abspath(sync_dir)
             rsync_call = [
                 '/usr/bin/rsync',
                 '-r',
