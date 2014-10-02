@@ -94,7 +94,11 @@ class HostManager(models.Manager):
         authorized_keys.add_keys(pubkeys, os.path.join(home_ssh, "authorized_keys"))
         # Notify other Hosts
         for host in other_hosts:
-            self._notify(this_host, host)
+            try:
+                self._notify(this_host, host)
+            except httplib.socket.error:
+                logger.waring("Could not notify to %s" % host)
+                continue
         return (this_host, created)
 
     def get_this(self):
