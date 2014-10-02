@@ -29,7 +29,7 @@ class Host(models.Model):
     username = models.CharField(max_length=256, blank=True, null=True)
     pubkey = models.CharField(max_length=512)
     sync_dirs = JSONField(blank=True, null=True, default='[]') # pylint: disable=E1120,E1123
-    root_path = models.CharField(max_length=512, blank=True, null=True)
+    root_path = models.CharField(max_length=512, blank=True, null=True, default=os.getcwd())
 
     objects = managers.HostManager()
 
