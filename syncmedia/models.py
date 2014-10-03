@@ -251,8 +251,8 @@ def sync(sender, **kw):
     if key in MODELS_SYNC.keys():
         kwargs = MODELS_SYNC[key]
         try:
-            Host.objects.get_this().push(**kwargs)
             Host.objects.get_this().pull(**kwargs)
+            Host.objects.get_this().push(**kwargs)
         except ObjectDoesNotExist, e:
             logger.error(e)
 post_save.connect(sync)
