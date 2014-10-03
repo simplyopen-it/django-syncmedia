@@ -2,7 +2,6 @@
 import os
 import pwd
 import subprocess
-# import random
 from threading import Thread
 from syncmedia import managers
 from syncmedia import reload_commands
@@ -12,11 +11,13 @@ from django.utils.log import getLogger
 from django.conf import settings
 from django_extensions.db.fields.json import JSONField
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from django.core.exceptions import ObjectDoesNotExist
+
 
 logger = getLogger("syncmedia.models")
-
-# FIXME: Maybe it would be better to keep an empty string as default
-SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", ['media/','hidden/'])
+SYNC_DIRS = getattr(settings, "SYNCHRO_DIRS", [])
+MODELS_SYNC = getattr(settings, 'MODELS_SYNC', {})
 PROJECT_PATH = getattr(settings, "PROJECT_PATH")
 COM_RELOAD = getattr(settings, "COMM_RELOAD", reload_commands.GUNICORN_WSGI)
 DEF_TIMEOUT = 10 # ssh timeout in seconds
@@ -244,10 +245,6 @@ class Host(models.Model):
             self.kill() # Self kill! :D
         return ret
 
-
-from django.db.models.signals import post_save
-from django.core.exceptions import ObjectDoesNotExist
-MODELS_SYNC = getattr(settings, 'MODELS_SYNC', {})
 
 def sync(sender, **kw):
     key = '.'.join([sender.__module__, sender.__name__])
