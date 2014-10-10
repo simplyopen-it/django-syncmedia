@@ -97,7 +97,7 @@ class HostManager(models.Manager):
             try:
                 self._notify(this_host, host)
             except httplib.socket.error:
-                logger.waring("Could not notify to %s" % host)
+                logger.warning("Could not notify to %s" % host)
                 continue
         return (this_host, created)
 
