@@ -215,7 +215,7 @@ class Host(models.Model):
             if host.sync_dirs:
                 to_sync = set(host.sync_dirs).intersection(to_sync)
             ret[host.url] = []
-            for sync_dir in sync_dirs:
+            for sync_dir in to_sync:
                 src_path = os.path.join(host.root_path, sync_dir) if host.root_path else abspath(sync_dir)
                 dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else abspath(sync_dir)
                 rsync_call = [
