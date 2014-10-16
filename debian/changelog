@@ -1,3 +1,22 @@
+django-syncmedia (0.3) unstable; urgency=medium
+
+  [ Michele Totaro ]
+  * fix default value on sync_dirs
+
+  [ Marco Pattaro ]
+  * handle push via post_save/post_delete signals
+  * handle relative src_path and dest_path.
+  * reimplement abspath to keep trailing path separators
+  * a sync always consit of a pull (from every host), then push (to every host)
+  * Host.root_path defaults to os.getcwd()
+  * fail to notify a new host is not fatal
+  * cleanup
+  * pull and push (not push and pull)
+  * fix typo
+  * get_auth_keys(), get_id_rsa()
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Thu, 16 Oct 2014 12:52:48 +0200
+
 django-syncmedia (0.2) unstable; urgency=medium
 
   [ Marco Pattaro ]
