@@ -1,4 +1,4 @@
-django-syncmedia (0.3) unstable; urgency=medium
+django-syncmedia (0.2.1) unstable; urgency=medium
 
   [ Michele Totaro ]
   * fix default value on sync_dirs
@@ -15,7 +15,7 @@ django-syncmedia (0.3) unstable; urgency=medium
   * fix typo
   * get_auth_keys(), get_id_rsa()
 
- -- Marco Pattaro <mpattaro@gmail.com>  Thu, 16 Oct 2014 12:52:48 +0200
+ -- Marco Pattaro <mpattaro@gmail.com>  Thu, 16 Oct 2014 12:56:15 +0200
 
 django-syncmedia (0.2) unstable; urgency=medium
 
