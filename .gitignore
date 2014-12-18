@@ -1,17 +1,10 @@
 *.db
 *~
 *.pyc
-local_settings.py
-*.mo
 *.swp
 *.swo
-exec.sh
-media/
-hidden/
 .project
 .pydevproject
-.settings/
 \#*
 .\#*
 .ropeproject
-***REMOVED***/locale/
