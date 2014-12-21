@@ -1,0 +1,58 @@
+* django-syncmedia
+  *syncmedia* is a Django application to keep uploaded files in sync
+  between multiple instances of a Django website deployed on different
+  machines.
+
+  The basic idea is to call a syncronization backend anytime a
+  registered Model is being saved, so that che configured Storage for
+  a FileField in the said Model is syncronized with other hosts. The
+  hosts to syncronize with are not necessay running *syncmedia* nor
+  even Django, unless we need a two way syncronization, but of course
+  the syncronization backend must be available on every host involved.
+
+** Syncronizations backends
+   At the moment only rsync is suported and implemented, but we have
+   plans to implement a backend using git (possibly with git-annex
+   https://github.com/joeyh/git-annex).
+
+** Configuration
+
+*** Models configuration
+    To start using syncmedia you need to specify ~MODEL_SYNC~ variable in
+    your ~settings.py~, this has to be a dictionary shaped like this:
+
+    #+BEGIN_SRC python
+      MODEL_SYNC = {
+          my_app.models.MyModelClass: {
+              'sycdirs': ['path/to/my/media/dir/', 'path/to/my/other/dir/'],
+              'exclude': '<file names to exclude pattern>'
+              }
+          }
+    #+END_SRC
+
+    Such a configuration will enable the call of a ~post_save~
+    callback for each configured Model class that will sync the
+    specified directories.
+
+*** Hosts configuration
+
+    For *syncmedia* to be able to push and pull files to and from each
+    host, the hosts needs to be able to connecto to each
+    others. *syncmedia* provides a management command to initialize
+    each host a make it register itself inside the database (as well
+    as forcing a /push/ or /pull/ operation, which can be userfull in
+    a cron job).
+
+    By calling the folowing command, the host will put itself inside
+    the Host table, providing its FQDN as the connection url, a unique
+    name to identify the host, a username and a rsa public key.
+
+    #+BEGIN_SRC sh
+      python manage.py sync_media init
+    #+END_SRC
+
+    Since, for now, the sync is made over ssh you'll need to make sure
+    each host includes other's hosts rsa public keys among it's
+    ~authorized_keys~. By default the path to rsa public kes is
+    ~$HOME/.ssh/id_rsa.pub~, but you can specify a different one by
+    setting ~PATH_RSA~ in your ~settings.py~.
