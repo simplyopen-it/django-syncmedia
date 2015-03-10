@@ -1,3 +1,29 @@
+django-syncmedia (0.2.3) unstable; urgency=medium
+
+  [ Marco Bardelli ]
+  * fix urls.py for forward compatibility
+
+  [ Antonio Corroppoli ]
+  * Add python-django-extensions as dependence
+  * Change version in __init__.py to 0.2.3
+
+  [ Marco Pattaro ]
+  * clenup gitignore
+
+  [ Marco Bardelli ]
+  * fix urls.py for forward compatibility
+
+  [ Antonio Corroppoli ]
+  * Add python-django-extensions as dependence
+  * Change version in __init__.py to 0.2.3
+
+  [ Marco Pattaro ]
+  * clenup gitignore
+  * Add README.org
+  * remove TODO.org
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Tue, 10 Mar 2015 16:15:54 +0100
+
 django-syncmedia (0.2.2) unstable; urgency=medium
 
   * fix pull() choice of direcotry to sync with each host.
