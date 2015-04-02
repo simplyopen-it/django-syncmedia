@@ -140,7 +140,9 @@ class Host(models.Model):
                 dest_path = os.path.join(host.root_path, sync_dir) if host.root_path else abspath(sync_dir)
                 rsync_call = [
                     '/usr/bin/rsync',
-                    '-r',
+                    '-a',
+                    '-z',
+                    '--ignore-existing',
                     '-e',
                     "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
                     (timeout, host.port, self.path_rsa),
@@ -220,7 +222,9 @@ class Host(models.Model):
                 dest_path = os.path.join(self.root_path, sync_dir) if self.root_path else abspath(sync_dir)
                 rsync_call = [
                     '/usr/bin/rsync',
-                    '-r',
+                    '-a',
+                    '-z',
+                    '--ignore-existing',
                     '-e',
                     "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=%s -p %s -i %s" % \
                     (timeout, host.port, self.path_rsa),
