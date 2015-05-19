@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils.log import getLogger
-from django.contrib.aderit.generic_utils.views import GenericProtectedView
+# from django.contrib.aderit.generic_utils.views import GenericProtectedView
+from simplyopen.views import GenericProtectedView
 from django.views.generic import View
 from django.http import HttpResponseRedirect, Http404
 from django.views.decorators.csrf import csrf_exempt
