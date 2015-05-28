@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-try:
-    from setuptools.core import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 from syncmedia import __version__
-
 setup(
     name='Syncmedia',
     version=__version__,
@@ -24,10 +19,6 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development",
     ],
-    packages=[
-        'syncmedia',
-        'syncmedia.management',
-        'syncmedia.migrations',
-        'syncmedia.management.commands',
-    ],
+    packages=find_packages(),
+    package_dir={'syncmedia': 'syncmedia'},
 )
