@@ -1,3 +1,15 @@
+django-syncmedia (1.0.0) unstable; urgency=medium
+
+  [ Marco Pattaro ]
+  * move migrations -> south_migrations
+  * import GenericProtected from simplyopen
+  * update setup.py
+
+  [ Marco Bardelli ]
+  * move dependencies in setup.py
+
+ -- Marco Bardelli <bardelli.marco@gmail.com>  Thu, 04 Jun 2015 16:23:31 +0200
+
 django-syncmedia (0.2.4) unstable; urgency=medium
 
   * change rsync params, add --ignore-existing
