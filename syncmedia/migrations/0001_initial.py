@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('username', models.CharField(max_length=256, null=True, blank=True)),
                 ('pubkey', models.CharField(max_length=512)),
                 ('sync_dirs', django_extensions.db.fields.json.JSONField(default=b'[]', null=True, blank=True)),
-                ('root_path', models.CharField(default=b'/home/marco/workspace/usatravelvisa', max_length=512, null=True, blank=True)),
+                ('root_path', models.CharField(max_length=512, null=True, blank=True)),
             ],
             options={
             },
