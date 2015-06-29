@@ -1,3 +1,10 @@
+django-syncmedia (1.0.1) unstable; urgency=medium
+
+  * migrations Django1.7 style
+  * clean up migrations
+
+ -- Marco Pattaro <mpattaro@gmail.com>  Mon, 29 Jun 2015 14:26:41 +0200
+
 django-syncmedia (1.0.0) unstable; urgency=medium
 
   [ Marco Pattaro ]
