@@ -2,12 +2,9 @@
 import getpass
 import sys
 import os
-
 from optparse import make_option
 from django.core.management.base import BaseCommand
-from django.core.exceptions import ObjectDoesNotExist
 from syncmedia.models import Host
-from socket import getfqdn
 
 class Command(BaseCommand):
 
@@ -73,25 +70,15 @@ class Command(BaseCommand):
             url = Host.objects.unregister()
             self.stdout.write("Unregistered host %s\n" % url)
         elif action == 'push':
-            url = getfqdn()
-            try:
-                host = Host.objects.get(url=url)
-                ret = host.command_push() # TODO: consent to specify dirs from options
-                if not all([elem[1] for elem in ret]):
-                    self.stdout.write(repr(ret) + "\n")
-            except ObjectDoesNotExist:
-                raise RuntimeError("Host %s is not registered, try to call 'syncmedia init' first",
-                                   url)
+            host = Host.objects.get_this()
+            ret = host.command_push()
+            if not all([elem[1] for elem in ret]):
+                self.stdout.write(repr(ret) + "\n")
         elif action == 'pull':
-            url = getfqdn()
-            try:
-                host = Host.objects.get(url=url)
-                ret = host.command_pull() # TODO: consent to specify a preferred host from options
-                if not all([elem[1] for elem in ret]):
-                    self.stdout.write(repr(ret) + "\n")
-            except ObjectDoesNotExist:
-                raise RuntimeError("Host %s is not registered, try to call 'syncmedia init' first",
-                                   url)
+            host = Host.objects.get_this()
+            ret = host.command_pull()
+            if not all([elem[1] for elem in ret]):
+                self.stdout.write(repr(ret) + "\n")
         else:
             self.stdout.write("./run.py sync_media %s\n" % Command.synopsis)
             sys.exit(1)
