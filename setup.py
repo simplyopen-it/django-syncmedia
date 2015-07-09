@@ -21,5 +21,5 @@ setup(
     ],
     packages=find_packages(),
     package_dir={'syncmedia': 'syncmedia'},
-    install_requires=['Django>=1.4','psutil'],
+    install_requires=['Django>=1.4','psutil', 'django-extensions'],
 )
