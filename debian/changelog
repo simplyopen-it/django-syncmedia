@@ -1,3 +1,12 @@
+django-syncmedia (1.0.3) unstable; urgency=medium
+
+  * cleanup unused code
+  * update gbp.conf
+  * remove old building script
+  * fix warnings
+
+ -- Marco Pattaro <marco.pattaro@simplyopen.org>  Wed, 13 Apr 2016 11:27:06 +0200
+
 django-syncmedia (1.0.2) unstable; urgency=low
 
   [ Antonio Corroppoli ]
