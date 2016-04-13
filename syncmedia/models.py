@@ -26,7 +26,7 @@ DEF_TIMEOUT = 10 # ssh timeout in seconds
 class Host(models.Model):
     hostname = models.CharField(max_length=256, unique=True)
     url = models.CharField(max_length=256, unique=True)
-    port = models.IntegerField(max_length=40, default=9922)
+    port = models.IntegerField(default=9922)
     username = models.CharField(max_length=256, blank=True, null=True)
     pubkey = models.CharField(max_length=512)
     sync_dirs = JSONField(blank=True, null=True, default='[]') # pylint: disable=E1120,E1123
