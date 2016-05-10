@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.utils.log import getLogger
-# from django.contrib.aderit.generic_utils.views import GenericProtectedView
-from simplyopen.views import GenericProtectedView
 from django.views.generic import View
 from django.http import HttpResponseRedirect, Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -31,8 +29,7 @@ class StaffProtectedView(View):
             raise Http404
 
 
-class SyncKeys(GenericProtectedView):
-    use_login_required_decorator = False
+class SyncKeys(View):
 
     def post(self, request, *args, **kwargs): # pylint: disable=W0613
         hid = request.POST.get('id')
@@ -57,8 +54,7 @@ class SyncKeys(GenericProtectedView):
         return super(SyncKeys, self).dispatch(*args, **kwargs)
 
 
-class SyncMediaView(StaffProtectedView, GenericProtectedView):
-    use_login_required_decorator = True
+class SyncMediaView(View):
 
     def get(self, request, *args, **kwargs):
         if request.GET.get('type') and request.GET.get('kill'):
