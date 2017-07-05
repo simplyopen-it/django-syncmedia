@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from logging import getLogger
+
 from django.contrib import admin
-from django.utils.log import getLogger
-from syncmedia.models import Host
+from .models import Host
 
 logger = getLogger("syncmedia.admin")
 
@@ -21,5 +22,3 @@ class HostAdmin(admin.ModelAdmin):
         'username',
     )
 admin.site.register(Host, HostAdmin)
-
-

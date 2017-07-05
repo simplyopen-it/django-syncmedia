@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.utils.log import getLogger
+import os
+import pwd
+from logging import getLogger
+
 from django.views.generic import View
 from django.http import HttpResponseRedirect, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from syncmedia.models import Host
 from django.conf import settings
-from syncmedia import authorized_keys
-import os
-import pwd
+
+from . import authorized_keys
+from .models import Host
 
 logger = getLogger('syncmedia.views')
 

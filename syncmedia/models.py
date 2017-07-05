@@ -2,12 +2,12 @@
 import os
 import pwd
 import subprocess
+from logging import getLogger
 from threading import Thread
 from syncmedia import managers
 from syncmedia import reload_commands
 from syncmedia.utils import abspath
 from django.db import models
-from django.utils.log import getLogger
 from django.conf import settings
 from django_extensions.db.fields.json import JSONField
 from django.core.exceptions import ValidationError

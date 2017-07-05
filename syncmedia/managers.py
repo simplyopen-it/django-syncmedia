@@ -3,11 +3,11 @@ import os
 import pwd
 import httplib
 import urllib
+from logging import getLogger
 from django.db import models
 from socket import gethostname, getfqdn
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.utils.log import getLogger
 from syncmedia import authorized_keys
 
 logger = getLogger("syncmedia.manager")
