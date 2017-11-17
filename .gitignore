@@ -8,3 +8,5 @@
 \#*
 .\#*
 .ropeproject
+dist/
+Syncmedia.egg-info/
